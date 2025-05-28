@@ -31,7 +31,7 @@ if (!$result_transaksi) {
 }
 
 $status_map = [
-    'belum bayar' => ['bg-danger text-dark', 'Belum bayar'],
+    'belumbayar' => ['bg-danger text-dark', 'Belum bayar'],
     'menunggu konfirmasi' => ['bg-warning text-dark', 'Menunggu Konfirmasi'],
     'dikonfirmasi' => ['bg-success text-dark', 'Dikonfirmasi (Silahkan Ambil Barang)'],
     'disewa' => ['bg-info text-dark', 'Disewa / Di Ambil Barang'],
