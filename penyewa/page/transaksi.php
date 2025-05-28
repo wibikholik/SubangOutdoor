@@ -99,7 +99,7 @@ $status_map = [
         </div>
         <div class="card-body">
           <?php
-          $id_transaksi = $transaksi['id_transaksi'];
+          $id_transaksi = $transaksi['id_transaksi']; 
           $tanggal_sewa = new DateTime($transaksi['tanggal_sewa']);
           $tanggal_kembali = new DateTime($transaksi['tanggal_kembali']);
           $lama_sewa = $tanggal_sewa->diff($tanggal_kembali)->days;

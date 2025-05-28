@@ -7,9 +7,9 @@ if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], ['admin', 'owner']
     exit;
 }
 
-include '../../route/koneksi.php'; 
+include '../route/koneksi.php'; 
 
-$$folder_upload = "image/barang/";
+$$folder_upload = "barang/gambar/";
 
 if (!is_dir($folder_upload)) {
     mkdir($folder_upload, 0755, true);
@@ -44,7 +44,7 @@ if (isset($_FILES['gambar']) && $_FILES['gambar']['error'] === 0) {
                       VALUES ('$Nama_Barang', '$Keterangan', '$new_file_name', '$Stok', '$Harga_Barang', '$Kategori', '$Unggulan')";
 
             if (mysqli_query($koneksi, $query)) {
-                header("Location: index.php?pesan=input");
+                header("Location: barang.php?pesan=input");
                 exit;
             } else {
                 echo "Error saat memasukkan data ke database: " . mysqli_error($koneksi);
