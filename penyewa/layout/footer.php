@@ -3,17 +3,19 @@
 			<div class="row">
 				<div class="col-lg-3  col-md-6 col-sm-6">
 					<div class="single-footer-widget">
-						<h6>About Us</h6>
+						<h6>Visi Subang Outdoor</h6>
 						<p>
-							Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore dolore
-							magna aliqua.
+							Menjadi penyedia layanan sewa perlengkapan outdoor terbaik di Subang dan sekitarnya, yang terpercaya, terjangkau, dan mendukung kegiatan alam bebas dengan aman dan nyaman.
 						</p>
 					</div>
 				</div>
 				<div class="col-lg-4  col-md-6 col-sm-6">
 					<div class="single-footer-widget">
-						<h6>Newsletter</h6>
-						<p>Stay update with our latest</p>
+						<h6>Contact Us</h6>
+						<p>	Email : Subangoutdoor@gmail.com<br>
+							WhatsApp : 0823-1988-8249<br>
+							Instagram : sewaalatcampingsubang
+					</p>
 						<div class="" id="mc_embed_signup">
 
 							<form target="_blank" novalidate="true" action="https://spondonit.us12.list-manage.com/subscribe/post?u=1462626880ade1ac87bd9c93a&amp;id=92a4423d01"
@@ -40,29 +42,21 @@
 					</div>
 				</div>
 				<div class="col-lg-3  col-md-6 col-sm-6">
-					<div class="single-footer-widget mail-chimp">
-						<h6 class="mb-20">Instragram Feed</h6>
-						<ul class="instafeed d-flex flex-wrap">
-							<li><img src="img/i1.jpg" alt=""></li>
-							<li><img src="img/i2.jpg" alt=""></li>
-							<li><img src="img/i3.jpg" alt=""></li>
-							<li><img src="img/i4.jpg" alt=""></li>
-							<li><img src="img/i5.jpg" alt=""></li>
-							<li><img src="img/i6.jpg" alt=""></li>
-							<li><img src="img/i7.jpg" alt=""></li>
-							<li><img src="img/i8.jpg" alt=""></li>
-						</ul>
-					</div>
-				</div>
-				<div class="col-lg-2 col-md-6 col-sm-6">
-					<div class="single-footer-widget">
-						<h6>Follow Us</h6>
-						<p>Let us be social</p>
-						<div class="footer-social d-flex align-items-center">
-							<a href="#"><i class="fa fa-facebook"></i></a>
-							<a href="#"><i class="fa fa-twitter"></i></a>
-							<a href="#"><i class="fa fa-dribbble"></i></a>
-							<a href="#"><i class="fa fa-behance"></i></a>
+	<div class="single-footer-widget mail-chimp">
+		<h6 class="mb-20">Location</h6>
+		<div class="map-responsive">
+			<iframe 
+				src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3960.2448268497484!2d107.760497!3d-6.981991!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e68d5b327c165c3%3A0x8e8f8c3d4b949e31!2sSubang%2C%20Jawa%20Barat!5e0!3m2!1sid!2sid!4v1625391332572!5m2!1sid!2sid" 
+				width="100%" 
+				height="200" 
+				style="border:0;" 
+				allowfullscreen="" 
+				loading="lazy">
+			</iframe>
+		</div>
+	</div>
+</div>
+
 						</div>
 					</div>
 				</div>

@@ -60,7 +60,7 @@ if ($id_penyewa) {
 									<li class="nav-item"><a class="nav-link" href="../../prosesLogin.php?logout=true">logout</a></li>
 								</ul>
 							</li>
-							<li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
+							<li class="nav-item"><a class="nav-link" href="../page/bantuan.php">Bantuan</a></li>
 						</ul>
 						<ul class="nav navbar-nav navbar-right">  
                         <li class="nav-item d-flex align-items-center gap-2">

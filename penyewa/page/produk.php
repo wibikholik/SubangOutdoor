@@ -176,8 +176,8 @@
       <div class="row justify-content-center">
         <div class="col-lg-6 text-center">
           <div class="section-title">
-            <h1>Product Unggulan</h1>
-            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+            <h1>About Us</h1>
+            <p>Subang Outdoor merupakan mitra yang menyediakan perlengkapan camping dan kegiatan luar ruang yang berada di wilayah Subang. Sebagai UMKM yang fokus pada penyewaan alat-alat outdoor seperti tenda, matras, kompor portable, dan perlengkapan lainnya, Subang Outdoor berkomitmen untuk mendukung kegiatan alam yang aman, nyaman, dan terjangkau. Dengan semangat kolaborasi, kami bersama Subang Outdoor menghadirkan solusi digital untuk mempermudah proses pemesanan dan meningkatkan layanan bagi para pecinta alam.</p>
           </div>
         </div>
       </div>
