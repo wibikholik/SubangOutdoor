@@ -1,0 +1,106 @@
+.detail-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 40px;
+    gap: 30px;
+  }
+
+  .image-section {
+    flex: 1;
+    max-width: 300px;
+  }
+
+  .main-image {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border-radius: 8px;
+    background-color: #f0f0f0;
+  }
+
+  .thumbnail-row {
+    display: flex;
+    margin-top: 10px;
+    gap: 10px;
+  }
+
+  .thumbnail-row img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+
+  .info-section {
+    flex: 1.5;
+  }
+
+  .info-section h3 {
+    font-weight: bold;
+  }
+
+  .info-section p {
+    margin: 4px 0;
+  }
+
+  .form-date {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 15px;
+  }
+
+  .form-date input {
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+  }
+
+  .btn-submit {
+    margin-top: 20px;
+    background-color: black;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 6px;
+    border: none;
+  }
+
+  .btn-submit:hover {
+    background-color: #333;
+  }
+  
+  produk-unggulan {
+    flex: 1;
+    min-width: 250px;
+  }
+  
+  .produk-unggulan h3 {
+    border-bottom: 1px solid #000;
+    padding-bottom: 5px;
+  }
+  
+  .unggulan-item {
+    display: flex;
+    align-items: center;
+    background-color: white;
+    padding: 5px;
+    margin-bottom: 10px;
+  }
+  
+  .unggulan-item img {
+    width: 50px;
+    height: 50px;
+    background-color: white;
+    margin-right: 10px;
+  }
+  
+  .harga {
+    font-weight: bold;
+  }
+  
+  .text-center {
+    text-align: center;
+    width: 100%;
+    padding: 20px;
+  }
