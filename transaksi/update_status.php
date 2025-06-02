@@ -22,7 +22,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'disewa',
         'di ambil barang',
         'terlambat dikembalikan',
-        'selesai',
         'batal'
     ];
 

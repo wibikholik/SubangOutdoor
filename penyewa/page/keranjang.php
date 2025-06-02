@@ -15,7 +15,7 @@ $id_penyewa = $_SESSION['user_id'];
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Karma Shop</title>
+    <title>Keranjang  - Subang Outdoor</title>
 
     <!-- Favicon-->
     <link rel="shortcut icon" href="img/fav.png">

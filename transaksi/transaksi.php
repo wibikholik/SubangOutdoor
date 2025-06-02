@@ -103,6 +103,10 @@ if (!$result_transaksi) {
                       $badgeClass = 'bg-warning text-dark';
                       $statusLabel = 'Menunggu Konfirmasi';
                       break;
+                  case 'menunggu konfirmasi pengembalian':
+                      $badgeClass = 'bg-warning text-dark';
+                      $statusLabel = 'Menunggu Konfirmasi pengembalian';
+                      break;
                   case 'dikonfirmasi':
                       $badgeClass = 'bg-primary';
                       $statusLabel = 'Dikonfirmasi (Silahkan Ambil Barang)';
@@ -162,7 +166,6 @@ if (!$result_transaksi) {
                     <option value="disewa" <?= $status === 'disewa' ? 'selected' : '' ?>>Disewa / Di Ambil Barang</option>
                     <option value="di ambil barang" <?= $status === 'di ambil barang' ? 'selected' : '' ?>>Di Ambil Barang</option>
                     <option value="terlambat dikembalikan" <?= $status === 'terlambat dikembalikan' ? 'selected' : '' ?>>Terlambat Dikembalikan</option>
-                    <option value="selesai" <?= $status === 'selesai' ? 'selected' : '' ?>>Selesai</option>
                     <option value="batal" <?= $status === 'batal' ? 'selected' : '' ?>>Batal</option>
                   </select>
                 </form>

@@ -48,7 +48,7 @@
   <meta name="description" content="">
   <meta name="keywords" content="">
   <meta charset="UTF-8">
-  <title>Karma Shop</title>
+  <title>Product - Subang Outdoor</title>
   <link rel="stylesheet" href="css/linearicons.css">
   <link rel="stylesheet" href="css/owl.carousel.css">
   <link rel="stylesheet" href="css/font-awesome.min.css">

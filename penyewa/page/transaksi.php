@@ -38,7 +38,8 @@ $status_map = [
     'di ambil barang' => ['bg-info text-dark', 'Disewa / Di Ambil Barang'],
     'terlambat dikembalikan' => ['bg-danger text-light', 'Terlambat Dikembalikan'],
     'selesai' => ['bg-success text-dark', 'Selesai'],
-    'batal' => ['bg-secondary', 'Batal']
+    'batal' => ['bg-secondary', 'Batal'],
+    'menunggu konfirmasi pengembalian' => ['bg-warning text-dark', 'Menunggu Konfirmasi Pengembalian'],
 ];
 ?>
 
@@ -46,7 +47,7 @@ $status_map = [
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <title>Histori Transaksi</title>
+  <title>Histori Transaksi - Subang Outdoor</title>
   <link rel="stylesheet" href="css/linearicons.css">
   <link rel="stylesheet" href="css/owl.carousel.css">
   <link rel="stylesheet" href="css/font-awesome.min.css">
@@ -158,7 +159,7 @@ $status_lc = strtolower(trim($transaksi['status']));
 $today = new DateTime();  // tanggal sekarang
 $tgl_kembali = new DateTime($transaksi['tanggal_kembali']);
 
-if ($status_lc === 'belum bayar') {
+if ($status_lc === 'belumbayar') {
 ?>
     <form action="pembayaran.php" method="GET" class="d-inline">
         <input type="hidden" name="id_transaksi" value="<?= htmlspecialchars($transaksi['id_transaksi']); ?>">
@@ -170,7 +171,7 @@ if ($status_lc === 'belum bayar') {
     $today >= $tgl_kembali
 ) {
 ?>
-    <form action="pengembalian.php" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin mengembalikan barang?');">
+    <form action="pengembalian.php" method="GET" class="d-inline" onsubmit="return confirm('Yakin ingin mengembalikan barang?');">
         <input type="hidden" name="id_transaksi" value="<?= htmlspecialchars($transaksi['id_transaksi']); ?>">
         <button type="submit" class="btn btn-danger btn-sm">Kembalikan</button>
     </form>

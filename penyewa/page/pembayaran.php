@@ -55,7 +55,7 @@ $stmt_penyewa->close();
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <title>Pembayaran #<?= htmlspecialchars($id_transaksi) ?></title>
+  <title>Pembayaran - Subang Outdoor<?= htmlspecialchars($id_transaksi) ?></title>
   <link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css" />
   <link rel="stylesheet" href="css/linearicons.css">
   <link rel="stylesheet" href="css/owl.carousel.css">
@@ -151,8 +151,10 @@ $stmt_penyewa->close();
     <!-- Upload Bukti -->
     <div class="w3-card w3-padding w3-margin-top w3-round-large">
       <h4>Upload Bukti Pembayaran</h4>
-      <h5>Silakan transfer ke rekening berikut:</h5>
+      <div class="alert alert-warning"><h5>Silakan transfer ke rekening berikut:</h5>
       <p>Nomor Rekening: <?= htmlspecialchars($transaksi['nomor_rekening']) ?></p>
+    </div>
+      
       <form action="../controller/prosesPembayaran.php" method="post" enctype="multipart/form-data">
         <input type="hidden" name="id_transaksi" value="<?= htmlspecialchars($id_transaksi) ?>">
         <input class="w3-input w3-border w3-margin-bottom" type="file" name="bukti_pembayaran" required accept="image/*,application/pdf" />

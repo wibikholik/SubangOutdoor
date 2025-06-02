@@ -84,7 +84,7 @@ $username = $_SESSION['username'];
     <div class="welcome">
         Selamat datang, <strong><?= htmlspecialchars($username) ?></strong>!
     </div>
-    <a href="../logout.php" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    <a href="../prosesLogin.php" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
 </main>
 
 </body>

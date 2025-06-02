@@ -22,6 +22,9 @@ $username = $_SESSION['username'] ?? 'Guest';
     <a href="../transaksi/transaksi.php" class="w3-bar-item w3-button">
       <i class="fas fa-receipt w3-margin-right"></i>Transaksi
     </a>
+    <a href="../pengembalian/pengembalian.php" class="w3-bar-item w3-button">
+      <i class="fas fa-receipt w3-margin-right"></i>Pengembalian
+    </a>
 
   <?php elseif ($role === 'owner'): ?>
     <a href="../owner/index_owner.php" class="w3-bar-item w3-button">
@@ -38,6 +41,9 @@ $username = $_SESSION['username'] ?? 'Guest';
     </a>
     <a href="../transaksi/transaksi.php" class="w3-bar-item w3-button">
       <i class="fas fa-receipt w3-margin-right"></i>Transaksi
+    </a>
+      <a href="../pengembalian/pengembalian.php" class="w3-bar-item w3-button">
+      <i class="fas fa-receipt w3-margin-right"></i>Pengembalian
     </a>
     <a href="../laporan/laporan.php" class="w3-bar-item w3-button">
       <i class="fas fa-file-alt w3-margin-right"></i>Data Laporan

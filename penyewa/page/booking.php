@@ -68,7 +68,7 @@ $result_metode = $koneksi->query("SELECT * FROM metode_pembayaran");
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Karma Shop - Checkout</title>
+    <title>Booking - Subang Outdoor</title>
 
     <link rel="stylesheet" href="css/linearicons.css" />
     <link rel="stylesheet" href="css/owl.carousel.css" />
