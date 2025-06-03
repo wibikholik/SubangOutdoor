@@ -3,72 +3,142 @@ $role = $_SESSION['role'] ?? 'guest';
 $username = $_SESSION['username'] ?? 'Guest';
 ?>
 
-<div class="w3-sidebar w3-bar-block w3-white w3-border-right" style="width:350px; border-top-right-radius: 30px;">
-  <div class="w3-center w3-padding-16">
-    <img src="gunung.jpg" style="border-radius:10px;" alt="Foto Profil">
-    
-  </div>
+<ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
-  <?php if ($role === 'admin'): ?>
-    <a href="../admin/index_admin.php" class="w3-bar-item w3-button">
-      <i class="fas fa-tachometer-alt w3-margin-right"></i>Dashboard Admin
-    </a>
-    <a href="../barang/barang.php" class="w3-bar-item w3-button">
-      <i class="fas fa-box-open w3-margin-right"></i>Barang
-    </a>
-    <a href="../DataPenyewa/penyewa.php" class="w3-bar-item w3-button">
-      <i class="fas fa-users w3-margin-right"></i>Penyewa
-    </a>
-    <a href="../transaksi/transaksi.php" class="w3-bar-item w3-button">
-      <i class="fas fa-receipt w3-margin-right"></i>Transaksi
-    </a>
-    <a href="../pengembalian/pengembalian.php" class="w3-bar-item w3-button">
-      <i class="fas fa-receipt w3-margin-right"></i>Pengembalian
+    <!-- Sidebar - Brand -->
+    <a class="sidebar-brand d-flex align-items-center justify-content-center" href="#">
+        <div class="sidebar-brand-icon">
+            <img src="../assets/img/pinguin.jpg" alt="Logo" style="width: 50px; height: 50px; border-radius: 50%;">
+        </div>
+        <div class="sidebar-brand-text mx-3">Subang Outdoor</div>
     </a>
 
-  <?php elseif ($role === 'owner'): ?>
-    <a href="../owner/index_owner.php" class="w3-bar-item w3-button">
-      <i class="fas fa-tachometer-alt w3-margin-right"></i>Dashboard Owner
-    </a>
-    <a href="../dataAdmin/admin.php" class="w3-bar-item w3-button">
-      <i class="fas fa-user-shield w3-margin-right"></i>Data Admin
-    </a>
-    <a href="../DataPenyewa/penyewa.php" class="w3-bar-item w3-button">
-      <i class="fas fa-users w3-margin-right"></i>Data Penyewa
-    </a>
-     <a href="../barang/barang.php" class="w3-bar-item w3-button">
-      <i class="fas fa-box-open w3-margin-right"></i>Barang
-    </a>
-    <a href="../transaksi/transaksi.php" class="w3-bar-item w3-button">
-      <i class="fas fa-receipt w3-margin-right"></i>Transaksi
-    </a>
-      <a href="../pengembalian/pengembalian.php" class="w3-bar-item w3-button">
-      <i class="fas fa-receipt w3-margin-right"></i>Pengembalian
-    </a>
-    <a href="../laporan/laporan.php" class="w3-bar-item w3-button">
-      <i class="fas fa-file-alt w3-margin-right"></i>Data Laporan
-    </a>
-    
-    
+    <!-- Divider -->
+    <hr class="sidebar-divider my-0">
 
-  <?php elseif ($role === 'penyewa'): ?>
-    <a href="../penyewa/home.php" class="w3-bar-item w3-button">
-      <i class="fas fa-tachometer-alt w3-margin-right"></i>Dashboard Penyewa
-    </a>
-    <a href="../barang/barang.php" class="w3-bar-item w3-button">
-      <i class="fas fa-box-open w3-margin-right"></i>Barang
-    </a>
-    <a href="../transaksi/transaksi.php" class="w3-bar-item w3-button">
-      <i class="fas fa-receipt w3-margin-right"></i>Transaksi
-    </a>
+    <?php
+    switch ($role) {
+        case 'admin':
+            ?>
+            <!-- Menu untuk Admin -->
+            <li class="nav-item">
+                <a class="nav-link" href="../admin/index_admin.php">
+                    <i class="fas fa-fw fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="../barang/barang.php">
+                    <i class="fas fa-fw fa-boxes"></i>
+                    <span>Barang</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="../dataPenyewa/penyewa.php">
+                    <i class="fas fa-fw fa-users"></i>
+                    <span>Penyewa</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="../transaksi/transaksi.php">
+                    <i class="fas fa-fw fa-clipboard-list"></i>
+                    <span>Transaksi</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="../pembayaran/pembayaran.php">
+                    <i class="fas fa-fw fa-money-check"></i>
+                    <span>Pembayaran</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="../pembayaran/metode.php">
+                    <i class="fas fa-fw fa-credit-card"></i>
+                    <span>Metode Pembayaran</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="../pengembalian/pengembalian.php">
+                    <i class="fas fa-fw fa-undo"></i>
+                    <span>Pengembalian</span>
+                </a>
+            </li>
+            <?php
+            break;
 
-  <?php else: ?>
-    <a href="../login.php" class="w3-bar-item w3-button">
-      <i class="fas fa-sign-in-alt w3-margin-right"></i>Login
-    </a>
-  <?php endif; ?>
+        case 'owner':
+            ?>
+            <!-- Menu untuk Owner -->
+            <li class="nav-item">
+                <a class="nav-link" href="../admin/index_admin.php">
+                    <i class="fas fa-fw fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="../barang/barang.php">
+                    <i class="fas fa-fw fa-boxes"></i>
+                    <span>Barang</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="../dataPenyewa/penyewa.php">
+                    <i class="fas fa-fw fa-users"></i>
+                    <span>Penyewa</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="../transaksi/transaksi.php">
+                    <i class="fas fa-fw fa-clipboard-list"></i>
+                    <span>Transaksi</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="../pembayaran/pembayaran.php">
+                    <i class="fas fa-fw fa-money-check"></i>
+                    <span>Pembayaran</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="../pembayaran/metode.php">
+                    <i class="fas fa-fw fa-credit-card"></i>
+                    <span>Metode Pembayaran</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="../pengembalian/pengembalian.php">
+                    <i class="fas fa-fw fa-undo"></i>
+                    <span>Pengembalian</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="../admin/data_admin.php">
+                    <i class="fas fa-fw fa-user-shield"></i>
+                    <span>Data Admin</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="../laporan/laporan.php">
+                    <i class="fas fa-fw fa-file-alt"></i>
+                    <span>Laporan</span>
+                </a>
+            </li>
+            <?php
+            break;
 
-  <div class="w3-bottom w3-padding-small">
-    <i class="fas fa-copyright"></i> <b>Subang Outdoor</b>
-  </div>
-</div>
+        default:
+            ?>
+            <!-- Menu untuk Guest (opsional) -->
+            <li class="nav-item">
+                <a class="nav-link" href="../login.php">
+                    <i class="fas fa-fw fa-sign-in-alt"></i>
+                    <span>Login</span>
+                </a>
+            </li>
+            <?php
+            break;
+    }
+    ?>
+
+    <hr class="sidebar-divider my-0">
+</ul>

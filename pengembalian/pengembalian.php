@@ -1,16 +1,16 @@
 <?php
 session_start();
-
-// Cek login dan role
-if (!isset($_SESSION['user_id']) || !isset($_SESSION['role']) || 
-    ($_SESSION['role'] !== 'admin' && $_SESSION['role'] !== 'owner')) {
+if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['admin', 'owner'])) {
     header('Location: ../login.php');
     exit;
 }
-
 include '../route/koneksi.php';
 
-// Ambil data pengembalian dengan join transaksi, penyewa, dan detail barang
+// Generate CSRF token jika belum ada
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 $query = "
 SELECT 
     p.id_pengembalian,
@@ -21,6 +21,7 @@ SELECT
     p.bukti_denda,
     p.total_denda,
     p.status_pengembalian,
+    p.tanggal_pengembalian,
     GROUP_CONCAT(CONCAT(b.nama_barang, ' (', dt.jumlah_barang, ')') SEPARATOR ', ') AS detail_barang
 FROM pengembalian p
 JOIN transaksi t ON p.id_transaksi = t.id_transaksi
@@ -31,154 +32,166 @@ GROUP BY p.id_pengembalian
 ORDER BY p.id_pengembalian DESC
 ";
 
-$result_pengembalian = mysqli_query($koneksi, $query);
-
-if (!$result_pengembalian) {
-    die('Query Error: ' . mysqli_error($koneksi));
+$result = mysqli_query($koneksi, $query);
+if (!$result) {
+    die("Query pengembalian gagal: " . mysqli_error($koneksi));
 }
-
-// Generate CSRF token untuk form
-if (empty($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+$pengembalianList = [];
+while ($row = mysqli_fetch_assoc($result)) {
+    $pengembalianList[] = $row;
 }
 ?>
 
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <title>Subang Outdoor - Daftar Pengembalian</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <meta charset="UTF-8" />
+    <title>Daftar Pengembalian - Subang Outdoor</title>
+    <link href="../assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet" />
+    <link href="../assets/css/sb-admin-2.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" rel="stylesheet" />
 </head>
-<body>
-  <?php include('../layout/sidebar.php'); ?>
-  <div style="margin-left:25%">
-    <?php include('../layout/navbar.php'); ?>
-    <div class="container mt-4">
-      <h3 class="mb-4">Daftar Pengembalian Barang</h3>
+<body id="page-top">
+<div id="wrapper">
+<?php include('../layout/sidebar.php'); ?>
 
-      <?php if (isset($_GET['success']) && $_GET['success'] === 'updated'): ?>
-        <div class="alert alert-success">Status pengembalian berhasil diperbarui.</div>
-      <?php elseif (isset($_GET['error']) && $_GET['error'] === 'invalid_input'): ?>
-        <div class="alert alert-danger">Input tidak valid.</div>
-      <?php elseif (isset($_GET['error']) && $_GET['error'] === 'update_failed'): ?>
-        <div class="alert alert-danger">Gagal memperbarui status pengembalian.</div>
-      <?php endif; ?>
+<div id="content-wrapper" class="d-flex flex-column">
+    <div id="content">
+        <?php include('../layout/navbar.php'); ?>
 
-      <?php if (mysqli_num_rows($result_pengembalian) === 0): ?>
-        <div class="alert alert-info">Belum ada data pengembalian.</div>
-      <?php else: ?>
-        <table class="table table-bordered table-hover align-middle">
-          <thead class="table-light">
-            <tr>
-              <th>ID Pengembalian</th>
-              <th>ID Transaksi</th>
-              <th>Nama Penyewa</th>
-              <th>Detail Barang</th>
-              <th>Kondisi Barang</th>
-              <th>Bukti Pengembalian</th>
-              <th>Bukti Denda</th>
-              <th>Total Denda</th>
-              <th>Status Pengembalian</th>
-              <th>Aksi</th>
-            </tr>
-          </thead>
-          <tbody>
-            <?php while ($row = mysqli_fetch_assoc($result_pengembalian)) : ?>
-              <?php
-                $status = $row['status_pengembalian'];
-                switch (strtolower($status)) {
-                    case 'menunggu konfirmasi pengembalian':
-                        $badgeClass = 'bg-warning text-dark';
-                        $statusLabel = 'Menunggu Konfirmasi Pengembalian';
-                        break;
-                    case 'selesai dikembalikan':
-                        $badgeClass = 'bg-success';
-                        $statusLabel = 'Selesai Dikembalikan';
-                        break;
-                    case 'ditolak':
-                        $badgeClass = 'bg-danger';
-                        $statusLabel = 'Ditolak';
-                        break;
-                    default:
-                        $badgeClass = 'bg-secondary';
-                        $statusLabel = ucfirst($status);
-                        break;
-                }
-              ?>
-              <tr>
-                <td><?= htmlspecialchars($row['id_pengembalian']); ?></td>
-                <td><?= htmlspecialchars($row['id_transaksi']); ?></td>
-                <td><?= htmlspecialchars($row['nama_penyewa']); ?></td>
-                <td><?= htmlspecialchars($row['detail_barang']); ?></td>
-                <td><?= htmlspecialchars($row['kondisi_barang']); ?></td>
-                <td>
-                  <?php if ($row['bukti_pengembalian']) : ?>
-                    <button type="button" class="btn btn-link p-0" data-bs-toggle="modal" data-bs-target="#modalPengembalian<?= $row['id_pengembalian'] ?>">Lihat</button>
-                    <div class="modal fade" id="modalPengembalian<?= $row['id_pengembalian'] ?>" tabindex="-1" aria-hidden="true">
-                      <div class="modal-dialog modal-dialog-centered modal-lg">
-                        <div class="modal-content">
-                          <div class="modal-header">
-                            <h5 class="modal-title">Bukti Pengembalian</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                          </div>
-                          <div class="modal-body text-center">
-                            <img src="../uploads/pengembalian/<?= htmlspecialchars($row['bukti_pengembalian']); ?>" alt="Bukti Pengembalian" class="img-fluid" />
-                          </div>
-                        </div>
-                      </div>
+        <div class="container-fluid">
+            <h1 class="h3 mb-4 text-gray-800">Daftar Pengembalian</h1>
+
+            <div class="card shadow mb-4">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" width="100%" cellspacing="0">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Transaksi</th>
+                                    <th>Nama Penyewa</th>
+                                    <th>Tanggal Pengembalian</th>
+                                    <th>Denda</th>
+                                    <th>Kondisi</th>
+                                    <th>Bukti Pengembalian</th>
+                                    <th>Bukti Bayar Denda</th>
+                                    <th>Status</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($pengembalianList as $row): ?>
+                                    <?php
+                                        $status = strtolower($row['status_pengembalian']);
+                                        $badge_class = match($status) {
+                                            'menunggu konfirmasi pengembalian' => 'warning',
+                                            'Selesai Dikembalikan' => 'success',
+                                            'ditolak' => 'danger',
+                                            default => 'secondary',
+                                        };
+                                    ?>
+                                    <tr>
+                                        <td><?= htmlspecialchars($row['id_pengembalian']) ?></td>
+                                        <td><?= htmlspecialchars($row['id_transaksi']) ?></td>
+                                        <td><?= htmlspecialchars($row['nama_penyewa']) ?></td>
+                                        <td><?= htmlspecialchars($row['tanggal_pengembalian']) ?></td>
+                                        <td>Rp <?= number_format($row['total_denda'], 0, ',', '.') ?></td>
+                                        <td><?= htmlspecialchars($row['kondisi_barang']) ?></td>
+                                        <td>
+                                            <?php if ($row['bukti_pengembalian']): ?>
+                                                <button 
+                                                    class="btn btn-sm btn-info btn-bukti" 
+                                                    data-toggle="modal" 
+                                                    data-target="#modalBukti" 
+                                                    data-img="../uploads/pengembalian/<?= htmlspecialchars($row['bukti_pengembalian']) ?>">
+                                                    Lihat
+                                                </button>
+                                            <?php else: ?>
+                                                <span class="text-muted">-</span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td>
+                                            <?php if ($row['bukti_denda']): ?>
+                                                <button 
+                                                    class="btn btn-sm btn-info btn-bukti" 
+                                                    data-toggle="modal" 
+                                                    data-target="#modalBukti" 
+                                                    data-img="../uploads/denda/<?= htmlspecialchars($row['bukti_denda']) ?>">
+                                                    Lihat
+                                                </button>
+                                            <?php else: ?>
+                                                <span class="text-muted">-</span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td>
+                                            <span class="badge badge-<?= $badge_class ?>">
+                                                <?= ucwords($row['status_pengembalian']) ?>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <form action="update_status.php" method="POST" style="min-width:150px;">
+                                                <!-- CSRF token -->
+                                                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
+                                                <!-- ID pengembalian -->
+                                                <input type="hidden" name="id_pengembalian" value="<?= htmlspecialchars($row['id_pengembalian']) ?>">
+                                                <!-- ID transaksi -->
+                                                <input type="hidden" name="id_transaksi" value="<?= htmlspecialchars($row['id_transaksi']) ?>">
+
+                                                <select name="status_baru" class="form-control form-control-sm" onchange="this.form.submit()">
+                                                    <option value="Menunggu Konfirmasi Pengembalian" <?= $row['status_pengembalian'] === 'Menunggu Konfirmasi Pengembalian' ? 'selected' : '' ?>>Menunggu Konfirmasi Pengembalian</option>
+                                                    <option value="Selesai Dikembalikan" <?= $row['status_pengembalian'] === 'Selesai Dikembalikan' ? 'selected' : '' ?>>Selesai</option>
+                                                    <option value="Ditolak Pengembalian" <?= $row['status_pengembalian'] === 'Ditolak Pengembalian' ? 'selected' : '' ?>>Ditolak Pengembalian</option>
+                                                </select>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
                     </div>
-                  <?php else: ?>
-                    <span class="text-muted">-</span>
-                  <?php endif; ?>
-                </td>
+                </div>
+            </div>
 
-                <td>
-                  <?php if ($row['bukti_denda']) : ?>
-                    <button type="button" class="btn btn-link p-0" data-bs-toggle="modal" data-bs-target="#modalDenda<?= $row['id_pengembalian'] ?>">Lihat</button>
-                    <div class="modal fade" id="modalDenda<?= $row['id_pengembalian'] ?>" tabindex="-1" aria-hidden="true">
-                      <div class="modal-dialog modal-dialog-centered modal-lg">
-                        <div class="modal-content">
-                          <div class="modal-header">
-                            <h5 class="modal-title">Bukti Denda</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                          </div>
-                          <div class="modal-body text-center">
-                            <img src="../uploads/denda/<?= htmlspecialchars($row['bukti_denda']); ?>" alt="Bukti Denda" class="img-fluid" />
-                          </div>
+            <!-- Modal Bukti Global -->
+            <div class="modal fade" id="modalBukti" tabindex="-1" role="dialog" aria-labelledby="modalBuktiLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalBuktiLabel">Pratinjau Bukti</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Tutup">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
                         </div>
-                      </div>
+                        <div class="modal-body text-center">
+                            <img id="imgBukti" src="" class="img-fluid" alt="Bukti Gambar">
+                        </div>
                     </div>
-                  <?php else: ?>
-                    <span class="text-muted">-</span>
-                  <?php endif; ?>
-                </td>
+                </div>
+            </div>
 
-                <td>Rp<?= number_format($row['total_denda'], 0, ',', '.'); ?></td>
-                <td><span class="badge <?= $badgeClass ?>"><?= $statusLabel; ?></span></td>
-                <td>
-                  <form method="post" action="update_status.php" class="d-inline">
-                    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token']; ?>">
-                    <input type="hidden" name="id_pengembalian" value="<?= $row['id_pengembalian']; ?>">
-                    <input type="hidden" name="id_transaksi" value="<?= $row['id_transaksi']; ?>">
-                    <select name="status_baru" class="form-select form-select-sm" onchange="this.form.submit()" required>
-                      <option disabled selected>Pilih Status</option>
-                      <option value="Menunggu Konfirmasi Pengembalian" <?= strtolower($status) === 'menunggu konfirmasi pengembalian' ? 'disabled' : '' ?>>Menunggu Konfirmasi Pengembalian</option>
-                      <option value="Selesai Dikembalikan" <?= strtolower($status) === 'selesai dikembalikan' ? 'disabled' : '' ?>>Selesai Dikembalikan</option>
-                      <option value="Ditolak" <?= strtolower($status) === 'ditolak' ? 'disabled' : '' ?>>Ditolak</option>
-                    </select>
-                  </form>
-                </td>
-              </tr>
-            <?php endwhile; ?>
-          </tbody>
-        </table>
-      <?php endif; ?>
+        </div>
     </div>
-  </div>
+</div>
+</div>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+<a class="scroll-to-top rounded" href="#page-top">
+    <i class="fas fa-angle-up"></i>
+</a>
+
+<script src="../assets/vendor/jquery/jquery.min.js"></script>
+<script src="../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="../assets/js/sb-admin-2.min.js"></script>
+
+<script>
+$(document).ready(function(){
+    $('.btn-bukti').click(function(){
+        var imgSrc = $(this).data('img');
+        $('#imgBukti').attr('src', imgSrc);
+    });
+});
+</script>
+
 </body>
 </html>

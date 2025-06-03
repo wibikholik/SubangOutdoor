@@ -19,164 +19,163 @@ $update_query = "
 ";
 mysqli_query($koneksi, $update_query);
 
-// Ambil data transaksi setelah update status
+// Ambil semua transaksi lengkap dengan nama metode dan nama penyewa
 $query_transaksi = "
-    SELECT t.*, mp.nama_metode
+    SELECT t.*, mp.nama_metode, p.nama_penyewa
     FROM transaksi t
     JOIN metode_pembayaran mp ON t.id_metode = mp.id_metode
+    JOIN penyewa p ON t.id_penyewa = p.id_penyewa
     ORDER BY t.id_transaksi DESC
 ";
 $result_transaksi = mysqli_query($koneksi, $query_transaksi);
 if (!$result_transaksi) {
     die("Query gagal: " . mysqli_error($koneksi));
 }
+
+// Ambil semua detail transaksi sekaligus agar lebih efisien
+$detail_query = "
+    SELECT dt.id_transaksi, dt.jumlah_barang, b.nama_barang, dt.harga_satuan
+    FROM detail_transaksi dt
+    JOIN barang b ON dt.id_barang = b.id_barang
+";
+$result_detail = mysqli_query($koneksi, $detail_query);
+$details_by_transaksi = [];
+while ($row = mysqli_fetch_assoc($result_detail)) {
+    $details_by_transaksi[$row['id_transaksi']][] = $row;
+}
+
+// Fungsi untuk badge bootstrap berdasarkan status transaksi
+function getBadgeClass($status) {
+    switch (strtolower(trim($status))) {
+        case 'selesai dikembalikan': return 'success';
+        case 'transaksi selesai': return 'success';
+        case 'disewa': return 'info';
+        case 'di ambil barang': return 'warning';
+        case 'terlambat dikembalikan': return 'danger';
+        case 'Menunggu Konfirmasi Pembayaran':
+        case 'Menunggu Konfirmasi Pengembalian': return 'warning text-dark';
+        case 'Dikonfirmasi Pembayaran': return 'primary';
+        case 'batal': return 'secondary';
+        case 'ditolak pengembalian': return 'danger';
+        default: return 'secondary';
+    }
+}
 ?>
 
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <title>Admin - Daftar Transaksi</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <meta charset="utf-8">
+    <title>Subang Outdoor - Data Transaksi</title>
+    <link href="../assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
+    <link href="../assets/css/sb-admin-2.min.css" rel="stylesheet">
 </head>
-<body>
-    <?php include('../layout/sidebar.php'); ?>
-    <!-- sidebar -->
 
-    <div style="margin-left:25%">
-        <?php include('../layout/navbar.php'); ?>
-      <h3 class="my-4">Daftar Semua Transaksi</h3>
-      
-      <?php if (mysqli_num_rows($result_transaksi) === 0): ?>
-        <div class="alert alert-info">Belum ada transaksi.</div>
-      <?php else: ?>
-      
-      <table class="table table-bordered table-hover">
-        <thead class="table-light">
-          <tr>
-            <th>ID Transaksi</th>
-            <th>ID Penyewa</th>
-            <th>Periode Sewa</th>
-            <th>Lama Sewa</th>
-            <th>Metode Pembayaran</th>
-            <th>Status</th>
-            <th>Detail Barang</th>
-            <th>Total Harga</th>
-            <th>Aksi</th>
-          </tr>
-        </thead>
-        <tbody>
-          <?php while ($transaksi = mysqli_fetch_assoc($result_transaksi)) : ?>
-            <?php
-              $tanggal_sewa = new DateTime($transaksi['tanggal_sewa']);
-              $tanggal_kembali = new DateTime($transaksi['tanggal_kembali']);
-              $lama_sewa = $tanggal_sewa->diff($tanggal_kembali)->days;
+<body id="page-top">
+<div id="wrapper">
 
-              $id_transaksi = $transaksi['id_transaksi'];
-              $stmt_detail = $koneksi->prepare("
-                SELECT dt.jumlah_barang, b.nama_barang, dt.harga_satuan
-                FROM detail_transaksi dt
-                JOIN barang b ON dt.id_barang = b.id_barang
-                WHERE dt.id_transaksi = ?
-              ");
-              if (!$stmt_detail) {
-                  die("Prepare statement gagal: " . $koneksi->error);
-              }
-              $stmt_detail->bind_param("i", $id_transaksi);
+    <?php include '../layout/sidebar.php'; ?>
 
-              if (!$stmt_detail->execute()) {
-                  die("Eksekusi query gagal: " . $stmt_detail->error);
-              }
+    <div id="content-wrapper" class="d-flex flex-column">
+        <div id="content">
+            <?php include '../layout/navbar.php'; ?>
 
-              $result_detail = $stmt_detail->get_result();
-              if (!$result_detail) {
-                  die("Ambil hasil query gagal: " . $stmt_detail->error);
-              }
+            <div class="container-fluid">
+                <h1 class="h3 mb-4 text-gray-800">Data Transaksi</h1>
 
-              $status = strtolower(trim($transaksi['status']));
+                <?php if (isset($_GET['success'])): ?>
+                    <div class="alert alert-success">Status transaksi berhasil diperbarui.</div>
+                <?php elseif (isset($_GET['error'])): ?>
+                    <div class="alert alert-danger">Terjadi kesalahan saat memperbarui status.</div>
+                <?php endif; ?>
 
-              // Badge dan label status
-              switch ($status) {
-                  case 'menunggu konfirmasi':
-                      $badgeClass = 'bg-warning text-dark';
-                      $statusLabel = 'Menunggu Konfirmasi';
-                      break;
-                  case 'menunggu konfirmasi pengembalian':
-                      $badgeClass = 'bg-warning text-dark';
-                      $statusLabel = 'Menunggu Konfirmasi pengembalian';
-                      break;
-                  case 'dikonfirmasi':
-                      $badgeClass = 'bg-primary';
-                      $statusLabel = 'Dikonfirmasi (Silahkan Ambil Barang)';
-                      break;
-                  case 'disewa':
-                  case 'di ambil barang':
-                      $badgeClass = 'bg-info text-dark';
-                      $statusLabel = 'Disewa / Di Ambil Barang';
-                      break;
-                  case 'terlambat dikembalikan':
-                      $badgeClass = 'bg-danger';
-                      $statusLabel = 'Terlambat Dikembalikan';
-                      break;
-                  case 'selesai':
-                      $badgeClass = 'bg-success';
-                      $statusLabel = 'Selesai';
-                      break;
-                  case 'batal':
-                      $badgeClass = 'bg-secondary';
-                      $statusLabel = 'Batal';
-                      break;
-                  default:
-                      $badgeClass = 'bg-secondary';
-                      $statusLabel = ucfirst($status);
-                      break;
-              }
-            ?>
-            <tr>
-              <td><?= htmlspecialchars($transaksi['id_transaksi']); ?></td>
-              <td><?= htmlspecialchars($transaksi['id_penyewa']); ?></td>
-              <td><?= htmlspecialchars($tanggal_sewa->format('d M Y') . " - " . $tanggal_kembali->format('d M Y')); ?></td>
-              <td><?= htmlspecialchars($lama_sewa . ' hari'); ?></td>
-              <td><?= htmlspecialchars($transaksi['nama_metode']); ?></td>
-              <td>
-                <span class="badge <?= $badgeClass ?>">
-                  <?= htmlspecialchars($statusLabel); ?>
-                </span>
-              </td>
-              <td>
-                <ul class="mb-0">
-                  <?php while ($detail = $result_detail->fetch_assoc()) : ?>
-                   <li>
-                    <?= htmlspecialchars($detail['nama_barang']) . 
-                        " (x" . htmlspecialchars($detail['jumlah_barang']) . ")" . 
-                        " Rp" . number_format($detail['harga_satuan'], 0, ',', '.') ?>
-                    </li>
-                  <?php endwhile; ?>
-                </ul>
-              </td> 
-              <td>Rp<?= number_format($transaksi['total_harga_sewa'], 0, ',', '.'); ?></td>
-              <td>
-                <form method="POST" action="update_status.php" class="d-inline">
-                  <input type="hidden" name="id_transaksi" value="<?= htmlspecialchars($transaksi['id_transaksi']); ?>">
-                  <select name="status_baru" onchange="this.form.submit()" class="form-select form-select-sm">
-                    <option value="menunggu konfirmasi" <?= $status === 'menunggu konfirmasi' ? 'selected' : '' ?>>Menunggu Konfirmasi</option>
-                    <option value="dikonfirmasi" <?= $status === 'dikonfirmasi' ? 'selected' : '' ?>>Dikonfirmasi (Silahkan Ambil Barang)</option>
-                    <option value="disewa" <?= $status === 'disewa' ? 'selected' : '' ?>>Disewa / Di Ambil Barang</option>
-                    <option value="di ambil barang" <?= $status === 'di ambil barang' ? 'selected' : '' ?>>Di Ambil Barang</option>
-                    <option value="terlambat dikembalikan" <?= $status === 'terlambat dikembalikan' ? 'selected' : '' ?>>Terlambat Dikembalikan</option>
-                    <option value="batal" <?= $status === 'batal' ? 'selected' : '' ?>>Batal</option>
-                  </select>
-                </form>
-              </td>
-            </tr>
-          <?php endwhile; ?>
-        </tbody>
-      </table>
-      <?php endif; ?>
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <a class="btn btn-primary" href="tambah_transaksi.php" role="button">Tambah Transaksi</a>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th>ID Transaksi</th>
+                                        <th>Nama Penyewa</th>
+                                        <th>Detail Barang</th>
+                                        <th>Total Harga</th>
+                                        <th>Status</th>
+                                        <th>Tanggal Sewa</th>
+                                        <th>Tanggal Kembali</th>
+                                        <th>Metode Pembayaran</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php while ($transaksi = mysqli_fetch_assoc($result_transaksi)) : ?>
+                                        <?php
+                                        $id_transaksi = $transaksi['id_transaksi'];
+                                        $status = strtolower(trim($transaksi['status']));
+                                        $badge_class = getBadgeClass($status);
+                                        ?>
+                                        <tr>
+                                            <td><?= htmlspecialchars($transaksi['id_transaksi']); ?></td>
+                                            <td><?= htmlspecialchars($transaksi['nama_penyewa']); ?></td>
+                                            <td>
+                                                <ul class="mb-0">
+                                                    <?php 
+                                                    if (isset($details_by_transaksi[$id_transaksi])): 
+                                                        foreach ($details_by_transaksi[$id_transaksi] as $detail): ?>
+                                                        <li>
+                                                            <?= htmlspecialchars($detail['nama_barang']); ?> 
+                                                            (x<?= htmlspecialchars($detail['jumlah_barang']); ?>) 
+                                                            - Rp <?= number_format($detail['harga_satuan'], 0, ',', '.'); ?>
+                                                        </li>
+                                                    <?php 
+                                                        endforeach; 
+                                                    endif; 
+                                                    ?>
+                                                </ul>
+                                            </td>
+                                            <td>Rp <?= number_format($transaksi['total_harga_sewa'], 0, ',', '.'); ?></td>
+                                            <td><span class="badge badge-<?= $badge_class; ?>"><?= ucfirst($transaksi['status']); ?></span></td>
+                                            <td><?= htmlspecialchars($transaksi['tanggal_sewa']); ?></td>
+                                            <td><?= htmlspecialchars($transaksi['tanggal_kembali']); ?></td>
+                                            <td><?= htmlspecialchars($transaksi['nama_metode']); ?></td>
+                                            <td>
+                                                <form method="POST" action="update_status.php" class="d-inline">
+                                                    <input type="hidden" name="id_transaksi" value="<?= htmlspecialchars($transaksi['id_transaksi']); ?>">
+                                                    <select name="status_baru" onchange="this.form.submit()" class="form-select form-select-sm">
+                                                        <option value="Menunggu Konfirmasi Pembayaran" <?= $status === 'Menunggu Konfirmasi Pembayaran' ? 'selected' : ''; ?>>Menunggu Konfirmasi  Pembayaran</option>
+                                                        <option value="menunggu konfirmasi pengembalian" <?= $status === 'menunggu konfirmasi pengembalian' ? 'selected' : ''; ?>>Menunggu Konfirmasi Pengembalian</option>
+                                                        <option value="selesai dikembalikan" <?= $status === 'selesai dikembalikan' ? 'selected' : ''; ?>>Selesai Dikembalikan</option>
+                                                        <option value="ditolak pengembalian" <?= $status === 'ditolak pengembalian' ? 'selected' : ''; ?>>Ditolak Pengembalian</option>
+                                                        <option value="dikonfirmasi" <?= $status === 'dikonfirmasi' ? 'selected' : ''; ?>>Dikonfirmasi (Silahkan Ambil Barang)</option>
+                                                        <option value="disewa" <?= $status === 'disewa' ? 'selected' : ''; ?>>Disewa</option>
+                                                        <option value="di ambil barang" <?= $status === 'di ambil barang' ? 'selected' : ''; ?>>Di Ambil Barang</option>
+                                                        <option value="terlambat dikembalikan" <?= $status === 'terlambat dikembalikan' ? 'selected' : ''; ?>>Terlambat Dikembalikan</option>
+                                                        <option value="batal" <?= $status === 'batal' ? 'selected' : ''; ?>>Batal</option>
+                                                    </select>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    <?php endwhile; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
     </div>
+</div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+<a class="scroll-to-top rounded" href="#page-top">
+    <i class="fas fa-angle-up"></i>
+</a>
+
+<script src="../assets/vendor/jquery/jquery.min.js"></script>
+<script src="../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="../assets/js/sb-admin-2.min.js"></script>
 </body>
 </html>

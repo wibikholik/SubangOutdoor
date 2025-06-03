@@ -9,157 +9,120 @@ if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], ['admin', 'owner']
 }
 
 $username = $_SESSION['username'];
-
 $query = "SELECT * FROM barang";
 $result = mysqli_query($koneksi, $query);
 ?>
 
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
+
 <head>
-    <meta charset="UTF-8" />
-    <title>Daftar Barang</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <!-- FontAwesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    <!-- W3.CSS -->
-    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css" />
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f7f8;
-            margin: 0; 
-            padding: 0;
-            display: flex;
-            min-height: 100vh;
-        }
-        /* Sidebar width */
-        .sidebar {
-            width: 25%;
-        }
-        /* Main content */
-        main {
-            flex-grow: 1;
-            background: white;
-            padding: 20px 30px;
-            border-radius: 12px;
-            box-shadow: 0 0 15px rgba(0,0,0,0.1);
-            margin: 20px;
-        }
-        header h1 {
-            margin: 0 0 15px 0;
-            color: #007BFF;
-        }
-        .btn-tambah {
-            background-color: #007BFF;
-            color: white;
-            padding: 8px 14px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 600;
-            margin-bottom: 15px;
-            display: inline-block;
-        }
-        .btn-tambah:hover {
-            background-color: #0056b3;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th, td {
-            padding: 10px;
-            border-bottom: 1px solid #ddd;
-            text-align: left;
-            vertical-align: middle;
-        }
-        th {
-            background-color: #f4f4f4;
-        }
-        img {
-            max-width: 100px;
-            height: auto;
-            border-radius: 6px;
-        }
-        .aksi a {
-            margin-right: 10px;
-            color: #333;
-            cursor: pointer;
-            font-size: 18px;
-        }
-        .aksi a:hover {
-            opacity: 0.7;
-        }
-    </style>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Subang Outdoor - Dashboard</title>
+
+    <!-- Font & Template CSS -->
+    <link href="../assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,400,700" rel="stylesheet">
+    <link href="../assets/css/sb-admin-2.min.css" rel="stylesheet">
 </head>
-<body>
 
-<div class="sidebar">
-    <?php include('../layout/sidebar.php'); ?>
-</div>
+<body id="page-top">
+    <div id="wrapper">
 
-<main>
-    <?php include('../layout/navbar.php'); ?>
+        <!-- Sidebar -->
+        <?php include '../layout/sidebar.php'; ?>
+        <!-- End of Sidebar -->
 
-    <header>
-        <h1>Daftar Barang</h1>
-        <a href="tambah_barang.php" class="btn-tambah"><i class="fas fa-plus"></i> Tambah Barang</a>
-    </header>
+        <div id="content-wrapper" class="d-flex flex-column">
+            <div id="content">
 
-    <?php if (isset($_GET['pesan'])): ?>
+                <!-- Navbar -->
+                <?php include '../layout/navbar.php'; ?>
+                <!-- End of Navbar -->
+
+                <div class="container-fluid">
+                    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                        <h1 class="h3 mb-0 text-gray-800">Barang</h1>
+                    </div>
+
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <a class="btn btn-primary" href="tambah.php" role="button">Tambah</a>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Nama</th>
+                                            <th>Gambar</th>
+                                            <th>Stok</th>
+                                            <th>Harga</th>
+                                            <th>Kategori</th>
+                                            <th>Keterangan</th>
+                                            <th>Unggulan</th>
+                                            <th>Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php if (mysqli_num_rows($result) > 0): ?>
+                                            <?php while ($row = mysqli_fetch_assoc($result)): ?>
+                                                <tr>
+                                                    <td><?= $row['id_barang'] ?></td>
+                                                    <td><?= htmlspecialchars($row['nama_barang']) ?></td>
+                                                    <td>
+                                                        <?php if (!empty($row['gambar'])): ?>
+                                                            <img src="barang/gambar/<?= $row['gambar'] ?>" width="100" alt="gambar">
+                                                        <?php else: ?>
+                                                            <em>tidak ada</em>
+                                                        <?php endif; ?>
+                                                    </td>
+                                                    <td><?= $row['stok'] ?></td>
+                                                    <td>Rp.<?= number_format($row['harga_sewa'], 0, ',', '.') ?></td>
+                                                    <td><?= htmlspecialchars($row['kategori']) ?></td>
+                                                    <td><?= htmlspecialchars($row['keterangan']) ?></td>
+                                                    <td><?= $row['unggulan'] == 1 ? 'YA' : 'TIDAK' ?></td>
+                                                    <td>
+                                                        <a class="btn btn-warning btn-sm" href="edit.php?id_barang=<?= $row['id_barang'] ?>">Edit</a>
+                                                        <a class="btn btn-danger btn-sm" href="hapus.php?id_barang=<?= $row['id_barang'] ?>" onclick="return confirm('Yakin ingin menghapus barang ini?')">Hapus</a>
+                                                    </td>
+                                                </tr>
+                                            <?php endwhile; ?>
+                                        <?php else: ?>
+                                            <tr>
+                                                <td colspan="9" class="text-center">Data barang belum tersedia.</td>
+                                            </tr>
+                                        <?php endif; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div> <!-- End card -->
+                </div> <!-- End container -->
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- JS Scripts -->
+    <script src="../assets/vendor/jquery/jquery.min.js"></script>
+    <script src="../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/vendor/jquery-easing/jquery.easing.min.js"></script>
+    <script src="../assets/js/sb-admin-2.min.js"></script>
+
+    <!-- Optional: DataTables if you use it -->
+    <script src="../assets/vendor/datatables/jquery.dataTables.min.js"></script>
+    <script src="../assets/vendor/datatables/dataTables.bootstrap4.min.js"></script>
     <script>
-        <?php 
-        $pesan = $_GET['pesan'];
-        if ($pesan == 'hapus'): ?>
-            alert("✅ Barang berhasil dihapus.");
-        <?php elseif ($pesan == 'gagalhapus'): ?>
-            alert("❌ Gagal menghapus barang karena masih digunakan dalam transaksi atau keranjang.");
-        <?php elseif ($pesan == 'gagalhapusdb'): ?>
-            alert("❌ Terjadi kesalahan saat menghapus dari database.");
-        <?php elseif ($pesan == 'invalid'): ?>
-            alert("❌ ID Barang tidak ditemukan.");
-        <?php endif; ?>
+        $(document).ready(function () {
+            $('#dataTable').DataTable();
+        });
     </script>
-    <?php endif; ?>
-
-    <table>
-        <thead>
-            <tr>
-                <th>ID Barang</th>
-                <th>Foto</th>
-                <th>Nama Barang</th>
-                <th>Keterangan</th>
-                <th>Kategori</th>
-                <th>Stok</th>
-                <th>Harga Sewa</th>
-                <th>Unggulan</th>
-                <th>Aksi</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php if(mysqli_num_rows($result) > 0): ?>
-                <?php while ($row = mysqli_fetch_assoc($result)) : ?>
-                    <tr>
-                        <td><?= htmlspecialchars($row['id_barang']) ?></td>
-                        <td><img src="barang/gambar/<?= htmlspecialchars($row['gambar']) ?>" alt="<?= htmlspecialchars($row['nama_barang']) ?>" /></td>
-                        <td><?= htmlspecialchars($row['nama_barang']) ?></td>
-                        <td><?= htmlspecialchars($row['keterangan']) ?></td>
-                        <td><?= htmlspecialchars($row['kategori']) ?></td>
-                        <td><?= htmlspecialchars($row['stok']) ?></td>
-                        <td>Rp <?= number_format($row['harga_sewa'], 0, ',', '.') ?></td>
-                        <td><?= $row['unggulan'] == 1 ? '✅' : '❌' ?></td>
-                        <td class="aksi">
-                            <a href="hapus.php?id_barang=<?= urlencode($row['id_barang']) ?>" onclick="return confirm('Apakah Anda yakin ingin menghapus barang ini?');" title="Hapus"><i class="fas fa-trash" style="color:#dc3545;"></i></a>
-                            <a href="edit.php?id_barang=<?= urlencode($row['id_barang']) ?>" title="Edit"><i class="fas fa-edit" style="color:#007BFF;"></i></a>
-                        </td>
-                    </tr>
-                <?php endwhile; ?>
-            <?php else: ?>
-                <tr><td colspan="9" style="text-align:center;">Data barang kosong.</td></tr>
-            <?php endif; ?>
-        </tbody>
-    </table>
-</main>
 
 </body>
+
 </html>

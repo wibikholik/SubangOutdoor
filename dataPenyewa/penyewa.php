@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-// Batasi akses hanya admin dan owner
+// Batasi akses hanya untuk admin dan owner
 if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], ['admin', 'owner'])) {
     header("Location: ../login.php?message=access_denied");
     exit;
@@ -12,160 +12,110 @@ include '../route/koneksi.php';
 // Handle pesan notifikasi
 $message = '';
 if (isset($_GET['pesan'])) {
-    $pesan = $_GET['pesan'];
-    if ($pesan == "input") {
+    if ($_GET['pesan'] == "input") {
         $message = "✅ Data berhasil ditambahkan.";
-    } elseif ($pesan == "hapus") {
+    } elseif ($_GET['pesan'] == "hapus") {
         $message = "✅ Data berhasil dihapus.";
-    } elseif ($pesan == "update") {
+    } elseif ($_GET['pesan'] == "update") {
         $message = "✅ Data berhasil diupdate.";
     }
 }
 
+// Ambil data penyewa dari database
 $query = "SELECT * FROM penyewa";
 $result = mysqli_query($koneksi, $query);
 ?>
 
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
+
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    
-    <!-- CSS eksternal -->
-    <link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css" />
-    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    
-    <title>Penyewa</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Subang Outdoor - Data Penyewa</title>
 
-    <style>
-        <?php include('../layout/style.css'); ?>
-        .message {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-            padding: 10px 15px;
-            border-radius: 5px;
-            margin: 20px 0;
-            font-weight: 600;
-        }
-
-        .container {
-            margin-left: 25%;
-            padding: 20px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th, td {
-            padding: 10px;
-            border-bottom: 1px solid #ddd;
-            text-align: left;
-            vertical-align: middle;
-        }
-
-        th {
-            background-color: #f4f4f4;
-        }
-
-        a.fas {
-            font-size: 18px;
-            margin-right: 10px;
-            cursor: pointer;
-        }
-
-        a.fas.fa-trash {
-            color: #dc3545;
-        }
-
-        a.fas.fa-edit {
-            color: #007bff;
-        }
-
-        a.add-user-btn {
-            display: inline-block;
-            margin-bottom: 15px;
-            padding: 8px 14px;
-            background-color: #007bff;
-            color: white;
-            text-decoration: none;
-            border-radius: 6px;
-            font-weight: 600;
-        }
-
-        a.add-user-btn:hover {
-            background-color: #0056b3;
-        }
-    </style>
+    <!-- Font & CSS -->
+    <link href="../assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
+    <link href="../assets/css/sb-admin-2.min.css" rel="stylesheet">
 </head>
 
-<body>
-    <!-- Sidebar -->
-    <?php include('../layout/sidebar.php'); ?>
+<body id="page-top">
 
-    <div class="container">
-        <?php include('../layout/navbar.php'); ?>
-        <h2>Daftar Penyewa</h2>
+    <div id="wrapper">
+        <!-- Sidebar -->
+        <?php include '../layout/sidebar.php'; ?>
+        <!-- End Sidebar -->
 
-      <?php if (!empty($message)) : ?>
-    <?php
-    $color = 'w3-green';
-    $icon = '<i class="fas fa-check-circle"></i>';
+        <div id="content-wrapper" class="d-flex flex-column">
+            <div id="content">
+                <!-- Topbar -->
+                <?php include '../layout/navbar.php'; ?>
+                <!-- End Topbar -->
 
-    if ($pesan == "hapus") {
-        $color = 'w3-red';
-        $icon = '<i class="fas fa-trash-alt"></i>';
-    } elseif ($pesan == "update") {
-        $color = 'w3-blue';
-        $icon = '<i class="fas fa-pen"></i>';
-    }
-    ?>
-    <div class="w3-panel <?= $color ?> w3-round w3-display-container w3-animate-opacity" style="margin: 16px;">
-        <span onclick="this.parentElement.style.display='none'" class="w3-button w3-large w3-display-topright">&times;</span>
-        <p><?= $icon ?> <?= $message ?></p>
+                <div class="container-fluid">
+                    <!-- Heading -->
+                    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                        <h1 class="h3 mb-0 text-gray-800">Data Penyewa</h1>
+                    </div>
+
+                    <!-- Notifikasi -->
+                    <?php if ($message != ''): ?>
+                        <div class="alert alert-success">
+                            <?= $message ?>
+                        </div>
+                    <?php endif; ?>
+
+                    <!-- Tabel Data -->
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <a class="btn btn-primary" href="tambahPenyewa.php" role="button">Tambah</a>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                    <thead class="thead-dark">
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Nama</th>
+                                            <th>Alamat</th>
+                                            <th>No. HP</th>
+                                            <th>Email</th>
+                                            <th>Password</th>
+                                            <th>Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php while ($row = mysqli_fetch_assoc($result)) : ?>
+                                            <tr>
+                                                <td><?= $row['id_penyewa'] ?></td>
+                                                <td><?= htmlspecialchars($row['nama_penyewa']) ?></td>
+                                                <td><?= htmlspecialchars($row['alamat']) ?></td>
+                                                <td><?= htmlspecialchars($row['no_hp']) ?></td>
+                                                <td><?= htmlspecialchars($row['email']) ?></td>
+                                                <td><?= htmlspecialchars($row['password']) ?></td>
+                                                <td>
+                                                    <a class="btn btn-warning btn-sm" href="editPenyewa.php?id=<?= $row['id_penyewa'] ?>">Edit</a>
+                                                    <a class="btn btn-danger btn-sm" href="hapusPenyewa.php?id=<?= $row['id_penyewa'] ?>" onclick="return confirm('Yakin ingin menghapus data ini?')">Hapus</a>
+                                                </td>
+                                            </tr>
+                                        <?php endwhile; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <!-- Footer bisa ditambahkan jika perlu -->
+        </div>
     </div>
-<?php endif; ?>
 
-
-        <a href="tambah_Penyewa.php" class="add-user-btn"><i class="fas fa-plus"></i> Tambah User</a>
-
-        <table class="table table-responsive table-striped">
-            <thead>
-                <tr>
-                    <th>ID Penyewa</th>
-                    <th>Nama Penyewa</th>
-                    <th>Alamat</th>
-                    <th>No HP</th>
-                    <th>Email</th>
-                    <th>Password</th>
-                    <th>Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php if (mysqli_num_rows($result) > 0): ?>
-                    <?php while ($row = mysqli_fetch_assoc($result)) : ?>
-                        <tr>
-                            <td><?= htmlspecialchars($row['id_penyewa']) ?></td>
-                            <td><?= htmlspecialchars($row['nama_penyewa']) ?></td>
-                            <td><?= htmlspecialchars($row['alamat']) ?></td>
-                            <td><?= htmlspecialchars($row['no_hp']) ?></td>
-                            <td><?= htmlspecialchars($row['email']) ?></td>
-                            <td><?= htmlspecialchars($row['password']) ?></td>
-                            <td>
-                                <a href="hapus.php?id_penyewa=<?= urlencode($row['id_penyewa']) ?>" class="fas fa-trash" onclick="return confirm('Apakah Anda yakin ingin menghapus penyewa ini?');" title="Hapus"></a>
-                                <a href="editPenyewa.php?id_penyewa=<?= urlencode($row['id_penyewa']) ?>" class="fas fa-edit" title="Edit"></a>
-                            </td>
-                        </tr>
-                    <?php endwhile; ?>
-                <?php else: ?>
-                    <tr><td colspan="7" style="text-align:center;">Data penyewa kosong.</td></tr>
-                <?php endif; ?>
-            </tbody>
-        </table>
-    </div>
+    <!-- JS -->
+    <script src="../assets/vendor/jquery/jquery.min.js"></script>
+    <script src="../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/vendor/jquery-easing/jquery.easing.min.js"></script>
+    <script src="../assets/js/sb-admin-2.min.js"></script>
 </body>
 </html>
