@@ -69,7 +69,7 @@ $result = mysqli_query($koneksi, $query);
                     <!-- Tabel Data -->
                     <div class="card shadow mb-4">
                         <div class="card-header py-3">
-                            <a class="btn btn-primary" href="tambahPenyewa.php" role="button">Tambah</a>
+                            <a class="btn btn-primary" href="tambah_Penyewa.php" role="button">Tambah</a>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
@@ -95,8 +95,9 @@ $result = mysqli_query($koneksi, $query);
                                                 <td><?= htmlspecialchars($row['email']) ?></td>
                                                 <td><?= htmlspecialchars($row['password']) ?></td>
                                                 <td>
-                                                    <a class="btn btn-warning btn-sm" href="editPenyewa.php?id=<?= $row['id_penyewa'] ?>">Edit</a>
-                                                    <a class="btn btn-danger btn-sm" href="hapusPenyewa.php?id=<?= $row['id_penyewa'] ?>" onclick="return confirm('Yakin ingin menghapus data ini?')">Hapus</a>
+                                                 <a class="btn btn-warning btn-sm" href="editPenyewa.php?id_penyewa=<?= $row['id_penyewa'] ?>">Edit</a>
+
+                                                    <a class="btn btn-danger btn-sm" href="hapus.php?id_penyewa=<?= $row['id_penyewa'] ?>" onclick="return confirm('Yakin ingin menghapus data ini?')">Hapus</a>
                                                 </td>
                                             </tr>
                                         <?php endwhile; ?>

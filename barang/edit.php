@@ -1,103 +1,145 @@
 <?php
 session_start();
-
 if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], ['owner', 'admin'])) {
     header('Location: ../login.php');
     exit;
 }
+include "../route/koneksi.php";
 ?>
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Data Barang</title>
+
+    <!-- SB Admin 2 Template -->
+    <link href="../assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,400,700" rel="stylesheet">
+    <link href="../assets/css/sb-admin-2.min.css" rel="stylesheet">
 </head>
-<body>
-    <!-- sidebar -->
+<body id="page-top">
+
+<!-- Page Wrapper -->
+<div id="wrapper">
+
+    <!-- Sidebar -->
     <?php include('../layout/sidebar.php'); ?>
-    <!-- sidebar -->
+    <!-- End Sidebar -->
 
-    <div style="margin-left:25%; padding:20px;">
-        <h3>Edit Data Barang</h3>
+    <!-- Content Wrapper -->
+    <div id="content-wrapper" class="d-flex flex-column">
 
-        <?php
-        include "../route/koneksi.php";
+        <!-- Main Content -->
+        <div id="content">
 
-        if (isset($_GET['id_barang'])) {
-            $id_barang = intval($_GET['id_barang']);
-            $stmt = mysqli_prepare($koneksi, "SELECT * FROM barang WHERE id_barang = ?");
-            mysqli_stmt_bind_param($stmt, "i", $id_barang);
-            mysqli_stmt_execute($stmt);
-            $result = mysqli_stmt_get_result($stmt);
+            <!-- Topbar -->
+            <?php include('../layout/navbar.php'); ?>
+            <!-- End Topbar -->
 
-            if ($data = mysqli_fetch_assoc($result)) {
-        ?>
-                <form action="update.php" method="post" enctype="multipart/form-data" class="w3-container w3-card-4 w3-light-grey">
-                    <input type="hidden" name="id_barang" value="<?= $data['id_barang'] ?>">
+            <!-- Begin Page Content -->
+            <div class="container-fluid">
 
-                    <p>
-                        <label>Nama Barang</label>
-                        <input class="w3-input w3-border" type="text" name="nama_barang" value="<?= htmlspecialchars($data['nama_barang']) ?>" required />
-                    </p>
+                <!-- Tombol Kembali -->
+              <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                        <h1 class="h3 mb-0 text-gray-800"><i ></i> Edit Barang</h1>
+                        <a href="barang.php" class="btn btn-sm btn-secondary shadow-sm">
+                            <i class="fas fa-arrow-left fa-sm text-white-50"></i> Kembali
+                        </a>
+                    </div>
 
-                    <p>
-                        <label>Keterangan</label>
-                        <input class="w3-input w3-border" type="text" name="keterangan" value="<?= htmlspecialchars($data['keterangan']) ?>" required />
-                    </p>
+                <?php
+                if (isset($_GET['id_barang'])) {
+                    $id_barang = intval($_GET['id_barang']);
+                    $stmt = mysqli_prepare($koneksi, "SELECT * FROM barang WHERE id_barang = ?");
+                    mysqli_stmt_bind_param($stmt, "i", $id_barang);
+                    mysqli_stmt_execute($stmt);
+                    $result = mysqli_stmt_get_result($stmt);
 
-                    <p>
-                        <label>Kategori</label>
-                        <select class="w3-select w3-border" name="kategori" required>
-                            <option value="" disabled <?= $data['kategori'] == '' ? 'selected' : '' ?>>Pilih Kategori</option>
-                            <option value="tenda" <?= $data['kategori'] == 'tenda' ? 'selected' : '' ?>>Tenda</option>
-                            <option value="perlengkapan masak" <?= $data['kategori'] == 'perlengkapan masak' ? 'selected' : '' ?>>Perlengkapan Masak</option>
-                            <option value="perlengkapan" <?= $data['kategori'] == 'perlengkapan' ? 'selected' : '' ?>>Perlengkapan Camping</option>
-                        </select>
-                    </p>
+                    if ($data = mysqli_fetch_assoc($result)) {
+                ?>
+                    <div class="card shadow mb-4">
+                        <div class="card-body">
+                            <form action="update.php" method="post" enctype="multipart/form-data">
+                                <input type="hidden" name="id_barang" value="<?= $data['id_barang'] ?>">
 
-                    <p>
-                        <label>
-                            <input type="checkbox" name="unggulan" value="1" <?= $data['unggulan'] == 1 ? 'checked' : '' ?> />
-                            Jadikan Produk Unggulan
-                        </label>
-                    </p>
+                                <div class="form-group">
+                                    <label>Nama Barang</label>
+                                    <input type="text" name="nama_barang" class="form-control" value="<?= htmlspecialchars($data['nama_barang']) ?>" required>
+                                </div>
 
-                    <p>
-                        <label>Gambar</label><br />
-                        <input type="file" name="gambar" accept="image/*" class="w3-input w3-border" />
-                        <?php if (!empty($data['gambar'])) : ?>
-                            <br />
-                            <img src="image/barang/<?= htmlspecialchars($data['gambar']) ?>" alt="Gambar Barang" style="width:100px; height:auto;" />
-                            <p class="w3-small">Biarkan kosong jika tidak ingin mengubah gambar.</p>
-                        <?php endif; ?>
-                    </p>
+                                <div class="form-group">
+                                    <label>Kategori</label>
+                                    <select name="kategori" class="form-control" required>
+                                        <option value="" disabled <?= $data['kategori'] == '' ? 'selected' : '' ?>>Pilih Kategori</option>
+                                        <option value="tenda" <?= $data['kategori'] == 'tenda' ? 'selected' : '' ?>>Tenda</option>
+                                        <option value="perlengkapan masak" <?= $data['kategori'] == 'perlengkapan masak' ? 'selected' : '' ?>>Perlengkapan Masak</option>
+                                        <option value="perlengkapan" <?= $data['kategori'] == 'perlengkapan' ? 'selected' : '' ?>>Perlengkapan Camping</option>
+                                    </select>
+                                </div>
 
-                    <p>
-                        <label>Stok Barang</label>
-                        <input class="w3-input w3-border" type="number" name="stok" min="0" value="<?= htmlspecialchars($data['stok']) ?>" required />
-                    </p>
+                                <div class="form-group form-check">
+                                    <input type="checkbox" name="unggulan" value="1" class="form-check-input" id="unggulanCheck" <?= $data['unggulan'] == 1 ? 'checked' : '' ?>>
+                                    <label class="form-check-label" for="unggulanCheck">Tandai sebagai Produk Unggulan</label>
+                                </div>
 
-                    <p>
-                        <label>Harga Sewa (per hari)</label>
-                        <input class="w3-input w3-border" type="number" name="harga_sewa" step="0.01" min="0" value="<?= htmlspecialchars($data['harga_sewa']) ?>" required />
-                    </p>
+                                <div class="form-group">
+                                    <label>Keterangan</label>
+                                    <textarea name="keterangan" class="form-control" required><?= htmlspecialchars($data['keterangan']) ?></textarea>
+                                </div>
 
-                    <p>
-                        <button class="w3-button w3-blue" type="submit">Simpan Perubahan</button>
-                    </p>
-                </form>
-        <?php
-            } else {
-                echo "<p class='w3-red w3-padding'>Data tidak ditemukan.</p>";
-            }
-            mysqli_stmt_close($stmt);
-        } else {
-            echo "<p class='w3-red w3-padding'>ID Barang tidak ditemukan.</p>";
-        }
-        ?>
+                                <div class="form-group">
+                                    <label>Gambar</label>
+                                    <input type="file" name="gambar" class="form-control-file" accept="image/*">
+                                    <?php if (!empty($data['gambar'])): ?>
+                                        <div class="mt-2">
+                                            <img src="image/barang/<?= htmlspecialchars($data['gambar']) ?>" alt="Gambar Barang" class="img-thumbnail" style="width: 150px;">
+                                            <small class="form-text text-muted">Kosongkan jika tidak ingin mengubah gambar.</small>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Stok Barang</label>
+                                    <input type="number" name="stok" class="form-control" min="0" value="<?= htmlspecialchars($data['stok']) ?>" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Harga Sewa (per hari)</label>
+                                    <input type="number" name="harga_sewa" class="form-control" step="0.01" min="0" value="<?= htmlspecialchars($data['harga_sewa']) ?>" required>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i> Simpan Perubahan
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                <?php
+                    } else {
+                        echo '<div class="alert alert-danger">Data tidak ditemukan.</div>';
+                    }
+                    mysqli_stmt_close($stmt);
+                } else {
+                    echo '<div class="alert alert-warning">ID Barang tidak tersedia.</div>';
+                }
+                ?>
+            </div>
+            <!-- /.container-fluid -->
+
+        </div>
+        <!-- End of Main Content -->
+
     </div>
+    <!-- End of Content Wrapper -->
+
+</div>
+<!-- End of Page Wrapper -->
+
+<!-- Scripts -->
+<script src="../assets/vendor/jquery/jquery.min.js"></script>
+<script src="../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="../assets/js/sb-admin-2.min.js"></script>
 </body>
 </html>
