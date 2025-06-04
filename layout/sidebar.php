@@ -52,7 +52,7 @@ $username = $_SESSION['username'] ?? 'Guest';
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="../pembayaran/metode.php">
+                <a class="nav-link" href="../metode_pembayaran/metode.php">
                     <i class="fas fa-fw fa-credit-card"></i>
                     <span>Metode Pembayaran</span>
                 </a>
@@ -100,7 +100,7 @@ $username = $_SESSION['username'] ?? 'Guest';
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="../pembayaran/metode.php">
+                <a class="nav-link" href="../metode_pembayaran/metode.php">
                     <i class="fas fa-fw fa-credit-card"></i>
                     <span>Metode Pembayaran</span>
                 </a>

@@ -1,21 +1,8 @@
-<?php
-session_start();
-
-// Tampilkan pesan logout atau error jika ada
-$message = '';
-if (isset($_GET['message'])) {
-    if ($_GET['message'] === 'logout') {
-        $message = "Anda berhasil logout.";
-    } elseif ($_GET['message'] === 'error') {
-        $message = "Username atau password salah!";
-    }
-}
-?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Login</title>
+    <title>Register</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -27,12 +14,12 @@ if (isset($_GET['message'])) {
             margin: 0;
         }
 
-        .login-container {
+        .register-container {
             background: #fff;
             padding: 30px 35px;
             border-radius: 12px;
             box-shadow: 0 0 15px rgba(0,0,0,0.1);
-            width: 360px;
+            width: 400px;
             text-align: center;
         }
 
@@ -49,7 +36,7 @@ if (isset($_GET['message'])) {
             margin-bottom: 6px;
         }
 
-        input[type="text"], input[type="password"] {
+        input, textarea {
             width: 100%;
             padding: 10px 14px;
             margin-bottom: 20px;
@@ -60,7 +47,7 @@ if (isset($_GET['message'])) {
         }
 
         button {
-            background-color: #007BFF;
+            background-color: #28a745;
             color: white;
             padding: 12px;
             width: 100%;
@@ -73,48 +60,47 @@ if (isset($_GET['message'])) {
         }
 
         button:hover {
-            background-color: #0056b3;
+            background-color: #218838;
         }
 
-        .message {
-            margin-bottom: 15px;
-            font-weight: 600;
-        }
-
-        .register-link {
+        .login-link {
             margin-top: 15px;
             font-size: 14px;
         }
 
-        .register-link a {
+        .login-link a {
             color: #007BFF;
             text-decoration: none;
         }
 
-        .register-link a:hover {
+        .login-link a:hover {
             text-decoration: underline;
         }
     </style>
 </head>
 <body>
-    <div class="login-container">
-        <h2>Login</h2>
-        <?php if ($message): ?>
-            <div class="message" style="color: <?= $_GET['message'] === 'error' ? 'red' : 'green' ?>;">
-                <?= htmlspecialchars($message) ?>
-            </div>
-        <?php endif; ?>
-        <form method="POST" action="prosesLogin.php">
-            <label>Username</label>
-            <input type="text" name="username" required>
-            
+    <div class="register-container">
+        <h2>Registrasi Penyewa</h2>
+        <form action="proses_register.php" method="POST">
+            <label>Nama Penyewa</label>
+            <input type="text" name="nama_penyewa" required>
+
+            <label>Alamat</label>
+            <textarea name="alamat" required></textarea>
+
+            <label>No HP</label>
+            <input type="text" name="no_hp" required>
+
+            <label>Email</label>
+            <input type="email" name="email" required>
+
             <label>Password</label>
             <input type="password" name="password" required>
-            
-            <button type="submit" name="login">Login</button>
+
+            <button type="submit" name="register">Daftar</button>
         </form>
-        <div class="register-link">
-            Belum punya akun? <a href="register.php">Daftar di sini</a>
+        <div class="login-link">
+            Sudah punya akun? <a href="login.php">Login di sini</a>
         </div>
     </div>
 </body>
