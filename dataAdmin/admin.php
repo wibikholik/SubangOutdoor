@@ -41,8 +41,7 @@ if (!$result) {
     <link href="../assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css" />
     <link
         href="https://fonts.googleapis.com/css?family=Nunito:200,400,700"
-        rel="stylesheet"
-    />
+        rel="stylesheet"/>
 
     <!-- Custom styles for this template-->
     <link href="../assets/css/sb-admin-2.min.css" rel="stylesheet" />
@@ -73,9 +72,7 @@ if (!$result) {
                     <!-- Page Heading -->
                     <div class="d-sm-flex align-items-center justify-content-between mb-4">
                         <h1 class="h3 mb-0 text-gray-800"><i class="fas fa-users-cog"></i> Data Admin</h1>
-                        <a href="tambah_admin.php" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
-                            <i class="fas fa-plus fa-sm text-white-50"></i> Tambah Admin
-                        </a>
+                        
                     </div>
 
                     <!-- Notifikasi Pesan -->
@@ -111,6 +108,7 @@ if (!$result) {
                                     cellspacing="0"
                                 >
                                     <thead class="thead-light">
+                                        <a href="tambah_admin.php" class="btn btn-primary ">Tambah Admin</a>
                                         <tr>
                                             <th>ID Admin</th>
                                             <th>Username</th>
@@ -132,11 +130,9 @@ if (!$result) {
                                                     <td><?= htmlspecialchars($row['no_hp']) ?></td>
                                                     <td><?= htmlspecialchars($row['email']) ?></td>
                                                     <td>
-                                                        <a href="editAdmin.php?id_admin=<?= urlencode($row['id_admin']) ?>" class="btn btn-sm btn-warning" title="Edit Data">
-                                                            <i class="fas fa-edit"></i>
+                                                        <a href="editAdmin.php?id_admin=<?= urlencode($row['id_admin']) ?>" class="btn btn-sm btn-warning" title="Edit Data">Edit
                                                         </a>
-                                                        <a href="hapus.php?id_admin=<?= urlencode($row['id_admin']) ?>" class="btn btn-sm btn-danger" title="Hapus Data" onclick="return confirm('Apakah Anda yakin ingin menghapus data ini?');">
-                                                            <i class="fas fa-trash"></i>
+                                                        <a href="hapus.php?id_admin=<?= urlencode($row['id_admin']) ?>" class="btn btn-sm btn-danger" title="Hapus Data" onclick="return confirm('Apakah Anda yakin ingin menghapus data ini?');">Hapus
                                                         </a>
                                                     </td>
                                                 </tr>

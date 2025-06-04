@@ -39,8 +39,11 @@ if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], ['owner', 'admin']
 
                 <!-- Page Heading -->
                 <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                    <h1 class="h3 mb-0 text-gray-800">Input Barang</h1>
-                </div>
+                        <h1 class="h3 mb-0 text-gray-800"><i ></i> Tambah Barang</h1>
+                        <a href="barang.php" class="btn btn-sm btn-secondary shadow-sm">
+                            <i class="fas fa-arrow-left fa-sm text-white-50"></i> Kembali
+                        </a>
+                    </div>
 
                 <!-- Form Input -->
                 <div class="card shadow mb-4">

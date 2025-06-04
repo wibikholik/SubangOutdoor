@@ -33,7 +33,12 @@ include "../route/koneksi.php";
             <!-- End of Navbar -->
 
             <div class="container-fluid">
-                <h1 class="h3 mb-4 text-gray-800">Edit Data Penyewa</h1>
+                <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                        <h1 class="h3 mb-0 text-gray-800"><i ></i> Edit Penyewa</h1>
+                        <a href="penyewa.php" class="btn btn-sm btn-secondary shadow-sm">
+                            <i class="fas fa-arrow-left fa-sm text-white-50"></i> Kembali
+                        </a>
+                    </div>
 
                 <?php
                 if (isset($_GET['id_penyewa'])) {

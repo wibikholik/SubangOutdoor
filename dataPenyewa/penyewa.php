@@ -97,7 +97,7 @@ $result = mysqli_query($koneksi, $query);
                                                 <td>
                                                  <a class="btn btn-warning btn-sm" href="editPenyewa.php?id_penyewa=<?= $row['id_penyewa'] ?>">Edit</a>
 
-                                                    <a class="btn btn-danger btn-sm" href="hapusPenyewa.php?id=<?= $row['id_penyewa'] ?>" onclick="return confirm('Yakin ingin menghapus data ini?')">Hapus</a>
+                                                    <a class="btn btn-danger btn-sm" href="hapus.php?id_penyewa=<?= $row['id_penyewa'] ?>" onclick="return confirm('Yakin ingin menghapus data ini?')">Hapus</a>
                                                 </td>
                                             </tr>
                                         <?php endwhile; ?>

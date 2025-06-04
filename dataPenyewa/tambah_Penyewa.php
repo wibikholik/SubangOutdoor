@@ -36,8 +36,12 @@ if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], ['admin', 'owner']
                 <!-- End of Topbar -->
 
                 <div class="container-fluid">
-                    <!-- Page Heading -->
-                    <h1 class="h3 mb-4 text-gray-800">Tambah Data Penyewa</h1>
+                    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                        <h1 class="h3 mb-0 text-gray-800"><i ></i> Tambah Penyewa</h1>
+                        <a href="penyewa.php" class="btn btn-sm btn-secondary shadow-sm">
+                            <i class="fas fa-arrow-left fa-sm text-white-50"></i> Kembali
+                        </a>
+                    </div>
 
                     <div class="card shadow mb-4">
                         <div class="card-body">

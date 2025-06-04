@@ -11,6 +11,20 @@ if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], ['admin', 'owner']
 $username = $_SESSION['username'];
 $query = "SELECT * FROM barang";
 $result = mysqli_query($koneksi, $query);
+
+// Notifikasi pesan
+$message = '';
+if (isset($_GET['pesan'])) {
+    if ($_GET['pesan'] == "input") {
+        $message = "✅ Data berhasil ditambahkan.";
+    } elseif ($_GET['pesan'] == "hapus") {
+        $message = "✅ Data berhasil dihapus.";
+    } elseif ($_GET['pesan'] == "update") {
+        $message = "✅ Data berhasil diupdate.";
+    } elseif ($_GET['pesan'] == "gagal") {
+        $message = "❌ Terjadi kesalahan saat memproses data.";
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -26,6 +40,9 @@ $result = mysqli_query($koneksi, $query);
     <link href="../assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
     <link href="https://fonts.googleapis.com/css?family=Nunito:200,400,700" rel="stylesheet">
     <link href="../assets/css/sb-admin-2.min.css" rel="stylesheet">
+
+    <!-- DataTables -->
+    <link href="../assets/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
 </head>
 
 <body id="page-top">
@@ -43,10 +60,23 @@ $result = mysqli_query($koneksi, $query);
                 <!-- End of Navbar -->
 
                 <div class="container-fluid">
+
+                    <!-- Page Heading -->
                     <div class="d-sm-flex align-items-center justify-content-between mb-4">
                         <h1 class="h3 mb-0 text-gray-800">Barang</h1>
                     </div>
 
+                    <!-- Alert Pesan -->
+                    <?php if (!empty($message)): ?>
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <?= $message ?>
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Tutup">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    <?php endif; ?>
+
+                    <!-- Data Barang -->
                     <div class="card shadow mb-4">
                         <div class="card-header py-3">
                             <a class="btn btn-primary" href="tambah_barang.php" role="button">Tambah</a>
@@ -114,7 +144,7 @@ $result = mysqli_query($koneksi, $query);
     <script src="../assets/vendor/jquery-easing/jquery.easing.min.js"></script>
     <script src="../assets/js/sb-admin-2.min.js"></script>
 
-    <!-- Optional: DataTables if you use it -->
+    <!-- DataTables Scripts -->
     <script src="../assets/vendor/datatables/jquery.dataTables.min.js"></script>
     <script src="../assets/vendor/datatables/dataTables.bootstrap4.min.js"></script>
     <script>
@@ -122,7 +152,6 @@ $result = mysqli_query($koneksi, $query);
             $('#dataTable').DataTable();
         });
     </script>
-
 </body>
 
 </html>

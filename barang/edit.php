@@ -6,27 +6,48 @@ if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], ['owner', 'admin']
 }
 include "../route/koneksi.php";
 ?>
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Data Barang</title>
+
+    <!-- SB Admin 2 Template -->
     <link href="../assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
     <link href="https://fonts.googleapis.com/css?family=Nunito:200,400,700" rel="stylesheet">
     <link href="../assets/css/sb-admin-2.min.css" rel="stylesheet">
 </head>
 <body id="page-top">
 
+<!-- Page Wrapper -->
 <div id="wrapper">
+
+    <!-- Sidebar -->
     <?php include('../layout/sidebar.php'); ?>
+    <!-- End Sidebar -->
 
+    <!-- Content Wrapper -->
     <div id="content-wrapper" class="d-flex flex-column">
-        <div id="content">
-            <?php include('../layout/navbar.php'); ?>
 
+        <!-- Main Content -->
+        <div id="content">
+
+            <!-- Topbar -->
+            <?php include('../layout/navbar.php'); ?>
+            <!-- End Topbar -->
+
+            <!-- Begin Page Content -->
             <div class="container-fluid">
-                <h1 class="h3 mb-4 text-gray-800">Edit Data Barang</h1>
+
+                <!-- Tombol Kembali -->
+              <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                        <h1 class="h3 mb-0 text-gray-800"><i ></i> Edit Barang</h1>
+                        <a href="barang.php" class="btn btn-sm btn-secondary shadow-sm">
+                            <i class="fas fa-arrow-left fa-sm text-white-50"></i> Kembali
+                        </a>
+                    </div>
 
                 <?php
                 if (isset($_GET['id_barang'])) {
@@ -72,8 +93,10 @@ include "../route/koneksi.php";
                                     <label>Gambar</label>
                                     <input type="file" name="gambar" class="form-control-file" accept="image/*">
                                     <?php if (!empty($data['gambar'])): ?>
-                                        <img src="image/barang/<?= htmlspecialchars($data['gambar']) ?>" alt="Gambar Barang" class="img-thumbnail mt-2" style="width: 150px;">
-                                        <small class="form-text text-muted">Kosongkan jika tidak ingin mengubah gambar.</small>
+                                        <div class="mt-2">
+                                            <img src="image/barang/<?= htmlspecialchars($data['gambar']) ?>" alt="Gambar Barang" class="img-thumbnail" style="width: 150px;">
+                                            <small class="form-text text-muted">Kosongkan jika tidak ingin mengubah gambar.</small>
+                                        </div>
                                     <?php endif; ?>
                                 </div>
 
@@ -87,7 +110,9 @@ include "../route/koneksi.php";
                                     <input type="number" name="harga_sewa" class="form-control" step="0.01" min="0" value="<?= htmlspecialchars($data['harga_sewa']) ?>" required>
                                 </div>
 
-                                <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i> Simpan Perubahan
+                                </button>
                             </form>
                         </div>
                     </div>
@@ -101,10 +126,18 @@ include "../route/koneksi.php";
                 }
                 ?>
             </div>
-        </div>
-    </div>
-</div>
+            <!-- /.container-fluid -->
 
+        </div>
+        <!-- End of Main Content -->
+
+    </div>
+    <!-- End of Content Wrapper -->
+
+</div>
+<!-- End of Page Wrapper -->
+
+<!-- Scripts -->
 <script src="../assets/vendor/jquery/jquery.min.js"></script>
 <script src="../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script src="../assets/js/sb-admin-2.min.js"></script>

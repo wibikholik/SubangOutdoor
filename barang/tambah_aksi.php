@@ -9,7 +9,7 @@ if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], ['admin', 'owner']
 
 include '../route/koneksi.php'; 
 
-$$folder_upload = "barang/gambar/";
+$folder_upload = "barang/gambar/";
 
 if (!is_dir($folder_upload)) {
     mkdir($folder_upload, 0755, true);
