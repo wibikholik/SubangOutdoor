@@ -47,17 +47,25 @@ while ($row = mysqli_fetch_assoc($result_detail)) {
 // Fungsi untuk badge bootstrap berdasarkan status transaksi
 function getBadgeClass($status) {
     switch (strtolower(trim($status))) {
-        case 'selesai dikembalikan': return 'success';
-        case 'transaksi selesai': return 'success';
-        case 'disewa': return 'info';
-        case 'di ambil barang': return 'warning';
-        case 'terlambat dikembalikan': return 'danger';
-        case 'Menunggu Konfirmasi Pembayaran':
-        case 'Menunggu Konfirmasi Pengembalian': return 'warning text-dark';
-        case 'Dikonfirmasi Pembayaran': return 'primary';
-        case 'batal': return 'secondary';
-        case 'ditolak pengembalian': return 'danger';
-        default: return 'secondary';
+        case 'selesai dikembalikan':
+        case 'transaksi selesai':
+            return 'success'; // hijau
+        case 'disewa':
+            return 'info'; // biru muda
+        case 'di ambil barang':
+            return 'warning'; // kuning
+        case 'terlambat dikembalikan':
+        case 'ditolak pengembalian':
+            return 'danger'; // merah
+        case 'menunggu konfirmasi pembayaran':
+        case 'menunggu konfirmasi pengembalian':
+            return 'warning'; // kuning
+        case 'dikonfirmasi silahkan ambilbarang':
+            return 'primary'; // biru tua
+        case 'batal':
+            return 'secondary'; // abu-abu
+        default:
+            return 'secondary'; // default abu-abu
     }
 }
 ?>
@@ -143,17 +151,26 @@ function getBadgeClass($status) {
                                             <td><?= htmlspecialchars($transaksi['nama_metode']); ?></td>
                                             <td>
                                                 <form method="POST" action="update_status.php" class="d-inline">
-                                                    <input type="hidden" name="id_transaksi" value="<?= htmlspecialchars($transaksi['id_transaksi']); ?>">
+                                                    <input type="hidden" name="id" value="<?= htmlspecialchars($transaksi['id_transaksi']); ?>">
+                                                    <input type="hidden" name="target_table" value="transaksi">
                                                     <select name="status_baru" onchange="this.form.submit()" class="form-select form-select-sm">
-                                                        <option value="Menunggu Konfirmasi Pembayaran" <?= $status === 'Menunggu Konfirmasi Pembayaran' ? 'selected' : ''; ?>>Menunggu Konfirmasi  Pembayaran</option>
-                                                        <option value="menunggu konfirmasi pengembalian" <?= $status === 'menunggu konfirmasi pengembalian' ? 'selected' : ''; ?>>Menunggu Konfirmasi Pengembalian</option>
-                                                        <option value="selesai dikembalikan" <?= $status === 'selesai dikembalikan' ? 'selected' : ''; ?>>Selesai Dikembalikan</option>
-                                                        <option value="ditolak pengembalian" <?= $status === 'ditolak pengembalian' ? 'selected' : ''; ?>>Ditolak Pengembalian</option>
-                                                        <option value="dikonfirmasi" <?= $status === 'dikonfirmasi' ? 'selected' : ''; ?>>Dikonfirmasi (Silahkan Ambil Barang)</option>
-                                                        <option value="disewa" <?= $status === 'disewa' ? 'selected' : ''; ?>>Disewa</option>
-                                                        <option value="di ambil barang" <?= $status === 'di ambil barang' ? 'selected' : ''; ?>>Di Ambil Barang</option>
-                                                        <option value="terlambat dikembalikan" <?= $status === 'terlambat dikembalikan' ? 'selected' : ''; ?>>Terlambat Dikembalikan</option>
-                                                        <option value="batal" <?= $status === 'batal' ? 'selected' : ''; ?>>Batal</option>
+                                                        <?php
+                                                        $status_options = [
+                                                            'menunggu konfirmasi pembayaran' => 'Menunggu Konfirmasi Pembayaran',
+                                                            'menunggu konfirmasi pengembalian' => 'Menunggu Konfirmasi Pengembalian',
+                                                            'selesai dikembalikan' => 'Selesai Dikembalikan',
+                                                            'ditolak pengembalian' => 'Ditolak Pengembalian',
+                                                            'dikonfirmasi Silahkan AmbilBarang' => 'Dikonfirmasi (Silahkan Ambil Barang)',
+                                                            'disewa' => 'Disewa',
+                                                            'di ambil barang' => 'Di Ambil Barang',
+                                                            'terlambat dikembalikan' => 'Terlambat Dikembalikan',
+                                                            'batal' => 'Batal'
+                                                        ];
+                                                        foreach ($status_options as $key => $label) {
+                                                            $selected = ($status === $key) ? 'selected' : '';
+                                                            echo "<option value=\"$key\" $selected>$label</option>";
+                                                        }
+                                                        ?>
                                                     </select>
                                                 </form>
                                             </td>

@@ -49,7 +49,7 @@ $result = mysqli_query($koneksi, $query);
 
                     <div class="card shadow mb-4">
                         <div class="card-header py-3">
-                            <a class="btn btn-primary" href="tambah.php" role="button">Tambah</a>
+                            <a class="btn btn-primary" href="tambah_barang.php" role="button">Tambah</a>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">

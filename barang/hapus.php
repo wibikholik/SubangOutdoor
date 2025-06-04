@@ -18,6 +18,20 @@ if (isset($_GET['id_barang'])) {
         exit;
     }
 
+    // Ambil nama file gambar dari database sebelum hapus
+    $result = mysqli_query($koneksi, "SELECT Gambar FROM barang WHERE id_barang = '$id_barang'");
+    $row = mysqli_fetch_assoc($result);
+
+    if ($row) {
+        $folder_upload = "barang/gambar/";
+        $file_gambar = $folder_upload . $row['Gambar'];
+
+        // Cek jika file gambar ada, hapus file gambar
+        if (file_exists($file_gambar)) {
+            unlink($file_gambar);
+        }
+    }
+
     // Jika aman, hapus data barang
     $query = mysqli_query($koneksi, "DELETE FROM barang WHERE id_barang = '$id_barang'");
 

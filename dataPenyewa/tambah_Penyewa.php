@@ -1,58 +1,82 @@
 <?php
 session_start();
 
-if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], ['owner', 'admin'])) {
-    header('Location: ../login.php');
+// Batasi akses hanya untuk admin dan owner
+if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], ['admin', 'owner'])) {
+    header("Location: ../login.php?message=access_denied");
     exit;
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css" />
-    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    <title>Input Data Barang</title>
-</head>
-<body>
-    <!-- sidebar -->
-    <?php include('../layout/sidebar.php'); ?>
-    <!-- sidebar -->
 
-    <div style="margin-left:25%; padding:20px;">
-         <?php include('../layout/navbar.php'); ?>
-        <h3>Input Data User</h3>
-        
-        <form action="tambah_aksi.php" method="post" class="w3-container w3-card-4 w3-light-grey" enctype="multipart/form-data" autocomplete="off">
-            <table>
-                <tr>
-                    <td>Nama Penyewa</td>
-                    <td><input type="text" name="namapenyewa" required class="w3-input w3-border" /></td>
-                </tr>
-                <tr>
-                    <td>Alamat</td>
-                    <td><input type="text" name="alamat" required class="w3-input w3-border" /></td>
-                </tr>
-                <tr>
-                    <td>No Hp</td>
-                    <td><input type="text" name="no_hp" required class="w3-input w3-border" /></td>
-                </tr>
-                <tr>
-                    <td>Email</td>
-                    <td><input type="email" name="email" required class="w3-input w3-border" /></td>
-                </tr>
-                <tr>
-                    <td>Password</td>
-                    <td><input type="password" name="password" required class="w3-input w3-border" autocomplete="new-password" /></td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td><input type="submit" class="w3-button w3-blue" value="Tambah" /></td>
-                </tr>
-            </table>
-        </form>
+<head>
+    <meta charset="UTF-8">
+    <title>Subang Outdoor - Tambah Penyewa</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Font & CSS -->
+    <link href="../assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
+    <link href="../assets/css/sb-admin-2.min.css" rel="stylesheet">
+</head>
+
+<body id="page-top">
+
+    <div id="wrapper">
+        <!-- Sidebar -->
+        <?php include('../layout/sidebar.php'); ?>
+        <!-- End of Sidebar -->
+
+        <div id="content-wrapper" class="d-flex flex-column">
+            <div id="content">
+                <!-- Topbar -->
+                <?php include('../layout/navbar.php'); ?>
+                <!-- End of Topbar -->
+
+                <div class="container-fluid">
+                    <!-- Page Heading -->
+                    <h1 class="h3 mb-4 text-gray-800">Tambah Data Penyewa</h1>
+
+                    <div class="card shadow mb-4">
+                        <div class="card-body">
+                            <form action="tambah_aksi.php" method="post" enctype="multipart/form-data" autocomplete="off">
+                                <div class="form-group">
+                                    <label for="namapenyewa">Nama Penyewa</label>
+                                    <input type="text" class="form-control" id="namapenyewa" name="namapenyewa" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="alamat">Alamat</label>
+                                    <input type="text" class="form-control" id="alamat" name="alamat" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="no_hp">No HP</label>
+                                    <input type="text" class="form-control" id="no_hp" name="no_hp" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="email">Email</label>
+                                    <input type="email" class="form-control" id="email" name="email" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="password">Password</label>
+                                    <input type="password" class="form-control" id="password" name="password" required autocomplete="new-password">
+                                </div>
+                                <button type="submit" class="btn btn-primary">Tambah</button>
+                            </form>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
     </div>
+
+    <!-- JS -->
+    <script src="../assets/vendor/jquery/jquery.min.js"></script>
+    <script src="../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/vendor/jquery-easing/jquery.easing.min.js"></script>
+    <script src="../assets/js/sb-admin-2.min.js"></script>
 </body>
+
 </html>

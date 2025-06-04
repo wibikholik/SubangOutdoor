@@ -112,7 +112,7 @@ $username = $_SESSION['username'] ?? 'Guest';
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="../admin/data_admin.php">
+                <a class="nav-link" href="../dataAdmin/admin.php">
                     <i class="fas fa-fw fa-user-shield"></i>
                     <span>Data Admin</span>
                 </a>

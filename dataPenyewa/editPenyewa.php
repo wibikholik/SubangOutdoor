@@ -4,79 +4,98 @@ if (!isset($_SESSION['username'])) {
     header("Location: ../login.php");
     exit;
 }
+include "../route/koneksi.php";
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <title>Edit Data Penyewa</title>
+
+    <!-- SB Admin 2 Assets -->
+    <link href="../assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,400,700" rel="stylesheet">
+    <link href="../assets/css/sb-admin-2.min.css" rel="stylesheet">
 </head>
-<body>
-    <!-- sidebar -->
+<body id="page-top">
+
+<div id="wrapper">
+    <!-- Sidebar -->
     <?php include('../layout/sidebar.php'); ?>
-    <!-- sidebar -->
+    <!-- End of Sidebar -->
 
-    <div style="margin-left:25%; padding:20px;">
-         <?php include('../layout/navbar.php'); ?>
-        <h3>Edit Data Penyewa</h3>
+    <div id="content-wrapper" class="d-flex flex-column">
+        <div id="content">
+            <!-- Navbar -->
+            <?php include('../layout/navbar.php'); ?>
+            <!-- End of Navbar -->
 
-        <?php
-        include "../route/koneksi.php";
+            <div class="container-fluid">
+                <h1 class="h3 mb-4 text-gray-800">Edit Data Penyewa</h1>
 
-        if (isset($_GET['id_penyewa'])) {
-            $id_penyewa = intval($_GET['id_penyewa']);
-            $stmt = mysqli_prepare($koneksi, "SELECT * FROM penyewa WHERE id_penyewa = ?");
-            mysqli_stmt_bind_param($stmt, "i", $id_penyewa);
-            mysqli_stmt_execute($stmt);
-            $result = mysqli_stmt_get_result($stmt);
+                <?php
+                if (isset($_GET['id_penyewa'])) {
+                    $id_penyewa = intval($_GET['id_penyewa']);
+                    $stmt = mysqli_prepare($koneksi, "SELECT * FROM penyewa WHERE id_penyewa = ?");
+                    mysqli_stmt_bind_param($stmt, "i", $id_penyewa);
+                    mysqli_stmt_execute($stmt);
+                    $result = mysqli_stmt_get_result($stmt);
 
-            if ($data = mysqli_fetch_assoc($result)) {
-        ?>
-                <form action="update.php" method="post" enctype="multipart/form-data" class="w3-container w3-card-4 w3-light-grey">
-                    <input type="hidden" name="id_penyewa" value="<?php echo $data['id_penyewa']; ?>" />
+                    if ($data = mysqli_fetch_assoc($result)) {
+                ?>
+                    <div class="card shadow mb-4">
+                        <div class="card-body">
+                            <form action="update.php" method="post" enctype="multipart/form-data">
+                                <input type="hidden" name="id_penyewa" value="<?= $data['id_penyewa']; ?>">
 
-                    <p>
-                        <label>Nama Penyewa</label>
-                        <input class="w3-input w3-border" type="text" name="namapenyewa" value="<?php echo htmlspecialchars($data['nama_penyewa']); ?>" required />
-                    </p>
+                                <div class="form-group">
+                                    <label>Nama Penyewa</label>
+                                    <input type="text" name="namapenyewa" class="form-control" value="<?= htmlspecialchars($data['nama_penyewa']); ?>" required>
+                                </div>
 
-                    <p>
-                        <label>Alamat</label>
-                        <input class="w3-input w3-border" type="text" name="alamat" value="<?php echo htmlspecialchars($data['alamat']); ?>" required />
-                    </p>
+                                <div class="form-group">
+                                    <label>Alamat</label>
+                                    <input type="text" name="alamat" class="form-control" value="<?= htmlspecialchars($data['alamat']); ?>" required>
+                                </div>
 
-                    <p>
-                        <label>No Hp</label>
-                        <input class="w3-input w3-border" type="text" name="no_hp" value="<?php echo htmlspecialchars($data['no_hp']); ?>" required />
-                    </p>
+                                <div class="form-group">
+                                    <label>No HP</label>
+                                    <input type="text" name="no_hp" class="form-control" value="<?= htmlspecialchars($data['no_hp']); ?>" required>
+                                </div>
 
-                    <p>
-                        <label>Email</label>
-                        <input class="w3-input w3-border" type="email" name="email" value="<?php echo htmlspecialchars($data['email']); ?>" required />
-                    </p>
+                                <div class="form-group">
+                                    <label>Email</label>
+                                    <input type="email" name="email" class="form-control" value="<?= htmlspecialchars($data['email']); ?>" required>
+                                </div>
 
-                    <p>
-                        <label>Password</label>
-                        <input class="w3-input w3-border" type="password" name="password" value="<?php echo htmlspecialchars($data['password']); ?>" required />
-                    </p>
+                                <div class="form-group">
+                                    <label>Password</label>
+                                    <input type="password" name="password" class="form-control" value="<?= htmlspecialchars($data['password']); ?>" required>
+                                </div>
 
-                    <p>
-                        <button class="w3-button w3-blue" type="submit">Simpan Perubahan</button>
-                    </p>
-                </form>
-        <?php
-            } else {
-                echo "<p class='w3-red w3-padding'>Data tidak ditemukan.</p>";
-            }
-            mysqli_stmt_close($stmt);
-        } else {
-            echo "<p class='w3-red w3-padding'>ID Penyewa tidak ditemukan.</p>";
-        }
-        ?>
+                                <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                            </form>
+                        </div>
+                    </div>
+                <?php
+                    } else {
+                        echo '<div class="alert alert-danger">Data penyewa tidak ditemukan.</div>';
+                    }
+                    mysqli_stmt_close($stmt);
+                } else {
+                    echo '<div class="alert alert-warning">ID Penyewa tidak tersedia.</div>';
+                }
+                ?>
+            </div>
+        </div>
     </div>
+</div>
+
+<!-- SB Admin 2 Scripts -->
+<script src="../assets/vendor/jquery/jquery.min.js"></script>
+<script src="../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="../assets/js/sb-admin-2.min.js"></script>
 </body>
 </html>
