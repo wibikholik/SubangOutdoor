@@ -60,7 +60,7 @@ function getBadgeClass($status) {
         case 'menunggu konfirmasi pembayaran':
         case 'menunggu konfirmasi pengembalian':
             return 'warning'; // kuning
-        case 'dikonfirmasi silahkan ambilbarang':
+        case 'Dikonfirmasi Pembayaran Silahkan AmbilBarang':
             return 'primary'; // biru tua
         case 'batal':
             return 'secondary'; // abu-abu
@@ -93,7 +93,7 @@ function getBadgeClass($status) {
                 <h1 class="h3 mb-4 text-gray-800">Data Transaksi</h1>
 
                 <?php if (isset($_GET['success'])): ?>
-                    <div class="alert alert-success">Status transaksi berhasil diperbarui.</div>
+                    <div class="alert alert-success">transaksi berhasil diperbarui.</div>
                 <?php elseif (isset($_GET['error'])): ?>
                     <div class="alert alert-danger">Terjadi kesalahan saat memperbarui status.</div>
                 <?php endif; ?>
@@ -149,29 +149,34 @@ function getBadgeClass($status) {
                                             <td><?= htmlspecialchars($transaksi['tanggal_sewa']); ?></td>
                                             <td><?= htmlspecialchars($transaksi['tanggal_kembali']); ?></td>
                                             <td><?= htmlspecialchars($transaksi['nama_metode']); ?></td>
-                                            <td>
-                                                <form method="POST" action="update_status.php" class="d-inline">
+                                           <td>
+                                                <form method="POST" action="update_status.php" class="mb-2">
                                                     <input type="hidden" name="id" value="<?= htmlspecialchars($transaksi['id_transaksi']); ?>">
                                                     <input type="hidden" name="target_table" value="transaksi">
-                                                    <select name="status_baru" onchange="this.form.submit()" class="form-select form-select-sm">
+                                                    <select name="status_baru" onchange="this.form.submit()" class="form-control form-control-sm">
                                                         <?php
                                                         $status_options = [
                                                             'menunggu konfirmasi pembayaran' => 'Menunggu Konfirmasi Pembayaran',
-                                                            'menunggu konfirmasi pengembalian' => 'Menunggu Konfirmasi Pengembalian',
-                                                            'selesai dikembalikan' => 'Selesai Dikembalikan',
-                                                            'ditolak pengembalian' => 'Ditolak Pengembalian',
-                                                            'dikonfirmasi Silahkan AmbilBarang' => 'Dikonfirmasi (Silahkan Ambil Barang)',
+                                                            'Dikonfirmasi Pembayaran Silahkan AmbilBarang' => 'Dikonfirmasi (Silahkan Ambil Barang)',
+                                                             'ditolak pembayaran' => 'Ditolak Pembayaran',
                                                             'disewa' => 'Disewa',
-                                                            'di ambil barang' => 'Di Ambil Barang',
                                                             'terlambat dikembalikan' => 'Terlambat Dikembalikan',
+                                                            'menunggu konfirmasi pengembalian' => 'Menunggu Konfirmasi Pengembalian',
+                                                            'ditolak pengembalian' => 'Ditolak Pengembalian',
+                                                            'selesai dikembalikan' => 'Selesai Dikembalikan',
                                                             'batal' => 'Batal'
                                                         ];
                                                         foreach ($status_options as $key => $label) {
-                                                            $selected = ($status === $key) ? 'selected' : '';
+                                                            $selected = ($status === strtolower($key)) ? 'selected' : '';
                                                             echo "<option value=\"$key\" $selected>$label</option>";
                                                         }
                                                         ?>
                                                     </select>
+                                                </form>
+
+                                                <form method="POST" action="hapus.php" onsubmit="return confirm('Yakin ingin menghapus transaksi ini?')">
+                                                    <input type="hidden" name="id_transaksi" value="<?= htmlspecialchars($transaksi['id_transaksi']); ?>">
+                                                    <button type="submit" class="btn btn-danger btn-sm w-100">Hapus</button>
                                                 </form>
                                             </td>
                                         </tr>

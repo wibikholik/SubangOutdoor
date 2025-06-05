@@ -98,7 +98,7 @@ if (isset($_GET['message'])) {
 </head>
 <body>
     <div class="login-container">
-        <h2>Login</h2>
+        <h2>Subang Outdoor</h2>
         <?php if ($message): ?>
             <div class="message" style="color: <?= $_GET['message'] === 'error' ? 'red' : 'green' ?>;">
                 <?= htmlspecialchars($message) ?>

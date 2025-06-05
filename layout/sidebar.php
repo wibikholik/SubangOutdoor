@@ -39,6 +39,12 @@ $username = $_SESSION['username'] ?? 'Guest';
                     <span>Penyewa</span>
                 </a>
             </li>
+             <li class="nav-item">
+                <a class="nav-link" href="../metode_pembayaran/metode.php">
+                    <i class="fas fa-fw fa-credit-card"></i>
+                    <span>Metode Pembayaran</span>
+                </a>
+            </li>
             <li class="nav-item">
                 <a class="nav-link" href="../transaksi/transaksi.php">
                     <i class="fas fa-fw fa-clipboard-list"></i>
@@ -51,12 +57,7 @@ $username = $_SESSION['username'] ?? 'Guest';
                     <span>Pembayaran</span>
                 </a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" href="../metode_pembayaran/metode.php">
-                    <i class="fas fa-fw fa-credit-card"></i>
-                    <span>Metode Pembayaran</span>
-                </a>
-            </li>
+           
             <li class="nav-item">
                 <a class="nav-link" href="../pengembalian/pengembalian.php">
                     <i class="fas fa-fw fa-undo"></i>
@@ -87,6 +88,18 @@ $username = $_SESSION['username'] ?? 'Guest';
                     <span>Penyewa</span>
                 </a>
             </li>
+             <li class="nav-item">
+                <a class="nav-link" href="../dataAdmin/admin.php">
+                    <i class="fas fa-fw fa-user-shield"></i>
+                    <span>Data Admin</span>
+                </a>
+            </li>
+             <li class="nav-item">
+                <a class="nav-link" href="../metode_pembayaran/metode.php">
+                    <i class="fas fa-fw fa-credit-card"></i>
+                    <span>Metode Pembayaran</span>
+                </a>
+            </li>
             <li class="nav-item">
                 <a class="nav-link" href="../transaksi/transaksi.php">
                     <i class="fas fa-fw fa-clipboard-list"></i>
@@ -99,24 +112,14 @@ $username = $_SESSION['username'] ?? 'Guest';
                     <span>Pembayaran</span>
                 </a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" href="../metode_pembayaran/metode.php">
-                    <i class="fas fa-fw fa-credit-card"></i>
-                    <span>Metode Pembayaran</span>
-                </a>
-            </li>
+           
             <li class="nav-item">
                 <a class="nav-link" href="../pengembalian/pengembalian.php">
                     <i class="fas fa-fw fa-undo"></i>
                     <span>Pengembalian</span>
                 </a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" href="../dataAdmin/admin.php">
-                    <i class="fas fa-fw fa-user-shield"></i>
-                    <span>Data Admin</span>
-                </a>
-            </li>
+           
             <li class="nav-item">
                 <a class="nav-link" href="../laporan/laporan.php">
                     <i class="fas fa-fw fa-file-alt"></i>

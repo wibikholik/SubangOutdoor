@@ -74,6 +74,7 @@ while ($row = mysqli_fetch_assoc($result)) {
                                         <th>Total Pembayaran</th>
                                         <th>Bukti</th>
                                         <th>Status</th>
+                                        <th>Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -102,17 +103,48 @@ while ($row = mysqli_fetch_assoc($result)) {
                                             <td>
                                                 <?php
                                                     $status = strtolower($row['status_pembayaran']);
-                                                    $badge_class = match($status) {
-                                                        'menunggu konfirmasi' => 'warning',
-                                                        'dikonfirmasi' => 'info',
-                                                        'selesai' => 'success',
-                                                        'batal' => 'danger',
-                                                        default => 'secondary',
-                                                    };
+                                                    $badge_class = 'secondary'; // default
+                                                    switch ($status) {
+                                                        case 'menunggu konfirmasi pembayaran':
+                                                            $badge_class = 'warning';
+                                                            break;
+                                                        case 'dikonfirmasi pembayaran silahkan ambilbarang':
+                                                            $badge_class = 'info';
+                                                            break;
+                                                        case 'ditolak pembayaran':
+                                                            $badge_class = 'danger';
+                                                            break;
+                                                        case 'selesai':
+                                                            $badge_class = 'success';
+                                                            break;
+                                                        case 'batal':
+                                                            $badge_class = 'danger';
+                                                            break;
+                                                    }
                                                 ?>
                                                 <span class="badge badge-<?= $badge_class ?>">
-                                                    <?= htmlspecialchars(ucfirst($row['status_pembayaran'])) ?>
+                                                    <?= htmlspecialchars($row['status_pembayaran']) ?>
                                                 </span>
+                                            </td>
+                                            <td>
+                                               <form method="POST" action="update_status.php" class="mb-0">
+                                                   <input type="hidden" name="id_pembayaran" value="<?= htmlspecialchars($row['id_pembayaran']); ?>">
+                                                   <select name="status_baru" onchange="this.form.submit()" class="form-control form-control-sm">
+                                                       <?php
+                                                       $status_options = [
+                                                           'menunggu konfirmasi pembayaran' => 'Menunggu Konfirmasi Pembayaran',
+                                                           'dikonfirmasi pembayaran silahkan ambilbarang' => 'Dikonfirmasi Pembayaran Silahkan Ambil Barang',
+                                                           'ditolak pembayaran' => 'Ditolak Pembayaran',
+                                                           'selesai' => 'Selesai',
+                                                           'batal' => 'Batal',
+                                                       ];
+                                                       foreach ($status_options as $value => $label) {
+                                                           $selected = ($status === $value) ? 'selected' : '';
+                                                           echo "<option value=\"$value\" $selected>$label</option>";
+                                                       }
+                                                       ?>
+                                                   </select>
+                                               </form>
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>
@@ -122,7 +154,7 @@ while ($row = mysqli_fetch_assoc($result)) {
                     </div>
                 </div>
 
-                <!-- Modal Bukti Pembayaran (hanya satu modal) -->
+                <!-- Modal Bukti Pembayaran -->
                 <div class="modal fade" id="modalBukti" tabindex="-1" aria-labelledby="modalBuktiLabel" aria-hidden="true">
                   <div class="modal-dialog modal-dialog-centered modal-lg">
                     <div class="modal-content">

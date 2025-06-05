@@ -31,15 +31,16 @@ if (!$result_transaksi) {
 }
 
 $status_map = [
-    'belumbayar' => ['bg-danger text-dark', 'Belum bayar'],
-    'menunggu konfirmasi' => ['bg-warning text-dark', 'Menunggu Konfirmasi'],
-    'dikonfirmasi' => ['bg-success text-dark', 'Dikonfirmasi (Silahkan Ambil Barang)'],
+    'menunggu konfirmasi pembayaran' => ['bg-warning text-dark', 'Menunggu Konfirmasi Pembayaran'],
+    'Dikonfirmasi Pembayaran Silahkan AmbilBarang' => ['bg-success text-dark', 'Dikonfirmasi (Silahkan Ambil Barang)'],
+    'Ditolak Pembayaran' => ['bg-danger text-light', 'Ditolak Pembayaran'],
+    'selesai Pembayaran' => ['bg-success text-dark', 'Selesai Pembayaran'],
     'disewa' => ['bg-info text-dark', 'Disewa / Di Ambil Barang'],
-    'di ambil barang' => ['bg-info text-dark', 'Disewa / Di Ambil Barang'],
     'terlambat dikembalikan' => ['bg-danger text-light', 'Terlambat Dikembalikan'],
-    'selesai' => ['bg-success text-dark', 'Selesai'],
-    'batal' => ['bg-secondary', 'Batal'],
     'menunggu konfirmasi pengembalian' => ['bg-warning text-dark', 'Menunggu Konfirmasi Pengembalian'],
+    'ditolak pengembalian' => ['bg-danger text-light', 'Ditolak Pengembalian'],
+    'selesai dikembalikan' => ['bg-success text-dark', 'Selesai Dikembalikan'],
+    'batal' => ['bg-secondary', 'Batal'],
 ];
 ?>
 
@@ -80,7 +81,7 @@ $status_map = [
     <div class="alert alert-info">Belum ada transaksi.</div>
   <?php endif; ?>
 
-  <div class="d-flex flex-wrap gap-4">
+  <div class="d-flex flex-wrap gap-4" style="gap: 10px;">
     <?php while ($transaksi = $result_transaksi->fetch_assoc()) : ?>
       <?php
         $status = strtolower(trim($transaksi['status']));

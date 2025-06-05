@@ -154,7 +154,7 @@ $result_metode = $koneksi->query("SELECT * FROM metode_pembayaran");
                             while ($metode = $result_metode->fetch_assoc()) : ?>
                                 <label class="me-3" style="cursor:pointer;">
                                     <input type="radio" name="id_metode" value="<?= (int)$metode['id_metode'] ?>" required />
-                                    <img src="../../image/metode/<?= htmlspecialchars($metode['gambar_metode']) ?>" alt="<?= htmlspecialchars($metode['nama_metode']) ?>" style="height:40px;" />
+                                    <img src="../../metode_pembayaran/metode/gambar/<?= htmlspecialchars($metode['gambar_metode']) ?>" alt="<?= htmlspecialchars($metode['nama_metode']) ?>" style="height:40px;" />
                                 </label>
                             <?php endwhile;
                         endif; ?>
