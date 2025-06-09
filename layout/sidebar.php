@@ -71,7 +71,7 @@ $username = $_SESSION['username'] ?? 'Guest';
             ?>
             <!-- Menu untuk Owner -->
             <li class="nav-item">
-                <a class="nav-link" href="../admin/index_admin.php">
+                <a class="nav-link" href="../owner/index_owner.php">
                     <i class="fas fa-fw fa-tachometer-alt"></i>
                     <span>Dashboard</span>
                 </a>
@@ -121,7 +121,7 @@ $username = $_SESSION['username'] ?? 'Guest';
             </li>
            
             <li class="nav-item">
-                <a class="nav-link" href="../laporan/laporan.php">
+                <a class="nav-link" href="../laporanowner/laporan.php">
                     <i class="fas fa-fw fa-file-alt"></i>
                     <span>Laporan</span>
                 </a>

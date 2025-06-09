@@ -74,7 +74,7 @@ while ($row = mysqli_fetch_assoc($result)) {
                                         <th>Total Pembayaran</th>
                                         <th>Bukti</th>
                                         <th>Status</th>
-                                        <th>Aksi</th>
+                                        <!-- <th>Aksi</th> -->
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -126,17 +126,19 @@ while ($row = mysqli_fetch_assoc($result)) {
                                                     <?= htmlspecialchars($row['status_pembayaran']) ?>
                                                 </span>
                                             </td>
-                                            <td>
+                                            <!-- <td>
                                                <form method="POST" action="update_status.php" class="mb-0">
                                                    <input type="hidden" name="id_pembayaran" value="<?= htmlspecialchars($row['id_pembayaran']); ?>">
                                                    <select name="status_baru" onchange="this.form.submit()" class="form-control form-control-sm">
                                                        <?php
                                                        $status_options = [
                                                            'menunggu konfirmasi pembayaran' => 'Menunggu Konfirmasi Pembayaran',
-                                                           'dikonfirmasi pembayaran silahkan ambilbarang' => 'Dikonfirmasi Pembayaran Silahkan Ambil Barang',
-                                                           'ditolak pembayaran' => 'Ditolak Pembayaran',
-                                                           'selesai' => 'Selesai',
+                                                           'dikonfirmasi Pembayaran Silahkan AmbilBarang' => 'Dikonfirmasi Pembayaran Silahkan Ambil Barang',
+                                                           'Ditolak Pembayaran' => 'Ditolak Pembayaran',
+                                                           'selesai Pembayaran' => 'Selesai Pembayaran',
                                                            'batal' => 'Batal',
+                                                           
+   
                                                        ];
                                                        foreach ($status_options as $value => $label) {
                                                            $selected = ($status === $value) ? 'selected' : '';
@@ -145,7 +147,7 @@ while ($row = mysqli_fetch_assoc($result)) {
                                                        ?>
                                                    </select>
                                                </form>
-                                            </td>
+                                            </td> -->
                                         </tr>
                                     <?php endforeach; ?>
                                 </tbody>

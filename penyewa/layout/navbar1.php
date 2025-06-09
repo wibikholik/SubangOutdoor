@@ -1,5 +1,6 @@
 <?php
-include '../../route/koneksi.php';
+include __DIR__ . '/../../route/koneksi.php';
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -49,19 +50,25 @@ if ($id_penyewa) {
 					<!-- Collect the nav links, forms, and other content for toggling -->
 					<div class="collapse navbar-collapse offset" id="navbarSupportedContent">
 						<ul class="nav navbar-nav menu_nav ml-auto">
-							<li class="nav-item"><a class="nav-link" href="../page/Home.php">Home</a></li>
-							<li class="nav-item"><a class="nav-link" href="../page/produk.php">Product</a></li>
-							<li class="nav-item"><a class="nav-link" href="../page/transaksi.php">Penyewaan</a></li>
-							<li class="nav-item submenu dropdown">
-								<a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
-								 aria-expanded="false">Auth</a>
-								<ul class="dropdown-menu">
-									<li class="nav-item"><a class="nav-link" href="../../login.php">Login</a></li>
-									<li class="nav-item"><a class="nav-link" href="../../prosesLogin.php?logout=true">logout</a></li>
-								</ul>
-							</li>
-							<li class="nav-item"><a class="nav-link" href="../page/bantuan.php">Bantuan</a></li>
-						</ul>
+    <li class="nav-item"><a class="nav-link" href="/subangoutdoor/index.php">Home</a></li>
+    <li class="nav-item"><a class="nav-link" href="/subangoutdoor/penyewa/page/produk.php">Product</a></li>
+    <li class="nav-item"><a class="nav-link" href="/subangoutdoor/penyewa/page/transaksi.php">Penyewaan</a></li>
+    <li class="nav-item submenu dropdown">
+        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+            Auth
+        </a>
+        <ul class="dropdown-menu">
+            <?php if (!isset($_SESSION['user_id'])): ?>
+                <li class="nav-item"><a class="nav-link" href="/subangoutdoor/login.php">Login</a></li>
+            <?php endif; ?>
+            <?php if (isset($_SESSION['user_id'])): ?>
+                <li class="nav-item"><a class="nav-link" href="/subangoutdoor/prosesLogin.php?logout=true">Logout</a></li>
+            <?php endif; ?>
+        </ul>
+    </li>
+    <li class="nav-item"><a class="nav-link" href="/subangoutdoor/penyewa/page/bantuan.php">Bantuan</a></li>
+</ul>
+
 						<ul class="nav navbar-nav navbar-right">  
                         <li class="nav-item d-flex align-items-center gap-2">
                             <!-- Bungkus ikon dan badge dalam div dengan posisi relatif -->

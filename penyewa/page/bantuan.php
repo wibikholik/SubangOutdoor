@@ -25,8 +25,7 @@ body {
   font-family: 'Inter', sans-serif;
   margin: 0;
   padding: 0;
-  color: #333;
-}
+  }
 
 .bantuan-section {
   padding: 2rem;

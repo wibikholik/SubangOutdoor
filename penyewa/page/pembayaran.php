@@ -109,7 +109,7 @@ $stmt_penyewa->close();
           <p><strong>Status:</strong> <?= htmlspecialchars($transaksi['status']) ?></p>
 
           <h4>Metode Pembayaran</h4>
-          <img src="../../image/metode/<?= htmlspecialchars($transaksi['gambar_metode']) ?>" 
+          <img src="../../metode_pembayaran/metode/gambar/<?= htmlspecialchars($transaksi['gambar_metode']) ?>" 
                alt="<?= htmlspecialchars($transaksi['nama_metode']) ?>" 
                style="height: 50px;" class="w3-margin-bottom">
           <p>

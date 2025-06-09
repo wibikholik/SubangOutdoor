@@ -140,14 +140,15 @@ $result_metode = $koneksi->query("SELECT * FROM metode_pembayaran");
                     </div>
 
                     <div style="min-width: 300px;">
-                        <h4>Tanggal Sewa</h4>
+                       <label for="tanggal_sewa" class="fw-bold fs-6">Sewa:</label>
+<input type="date" id="tanggal_sewa" name="tanggal_sewa" class="w3-input w3-border mb-3" required
+       style="font-size:14px; padding:6px;"
+       min="<?= date('Y-m-d') ?>" />
 
-                        <label for="tanggal_sewa" class="fw-bold fs-6">Sewa:</label>
-                        <input type="date" id="tanggal_sewa" name="tanggal_sewa" class="w3-input w3-border mb-3" required style="font-size:14px; padding:6px;" />
-
-                        <label for="tanggal_kembali" class="fw-bold fs-6">Kembali:</label>
-                        <input type="date" id="tanggal_kembali" name="tanggal_kembali" class="w3-input w3-border mb-3" required style="font-size:14px; padding:6px;" />
-
+<label for="tanggal_kembali" class="fw-bold fs-6">Kembali:</label>
+<input type="date" id="tanggal_kembali" name="tanggal_kembali" class="w3-input w3-border mb-3" required
+       style="font-size:14px; padding:6px;"
+       min="<?= date('Y-m-d') ?>" />
                         <h4>Metode Pembayaran</h4>
                         <?php
                         if ($result_metode->num_rows > 0) :

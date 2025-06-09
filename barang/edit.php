@@ -75,7 +75,7 @@ include "../route/koneksi.php";
                                         <option value="" disabled <?= $data['kategori'] == '' ? 'selected' : '' ?>>Pilih Kategori</option>
                                         <option value="tenda" <?= $data['kategori'] == 'tenda' ? 'selected' : '' ?>>Tenda</option>
                                         <option value="perlengkapan masak" <?= $data['kategori'] == 'perlengkapan masak' ? 'selected' : '' ?>>Perlengkapan Masak</option>
-                                        <option value="perlengkapan" <?= $data['kategori'] == 'perlengkapan' ? 'selected' : '' ?>>Perlengkapan Camping</option>
+                                        <option value="perlengkapan camping" <?= $data['kategori'] == 'perlengkapan camping' ? 'selected' : '' ?>>Perlengkapan Camping</option>
                                     </select>
                                 </div>
 

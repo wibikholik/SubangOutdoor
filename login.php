@@ -7,7 +7,7 @@ if (isset($_GET['message'])) {
     if ($_GET['message'] === 'logout') {
         $message = "Anda berhasil logout.";
     } elseif ($_GET['message'] === 'error') {
-        $message = "Username atau password salah!";
+        $message = "Email atau password salah!";
     }
 }
 ?>
@@ -32,13 +32,18 @@ if (isset($_GET['message'])) {
             padding: 30px 35px;
             border-radius: 12px;
             box-shadow: 0 0 15px rgba(0,0,0,0.1);
-            width: 360px;
+            width: 400px;
             text-align: center;
         }
 
         h2 {
             color: #333;
             margin-bottom: 25px;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            font-weight: bold;
         }
 
         label {
@@ -49,7 +54,7 @@ if (isset($_GET['message'])) {
             margin-bottom: 6px;
         }
 
-        input[type="text"], input[type="password"] {
+        input {
             width: 100%;
             padding: 10px 14px;
             margin-bottom: 20px;
@@ -60,7 +65,7 @@ if (isset($_GET['message'])) {
         }
 
         button {
-            background-color: #007BFF;
+            background-color: #28a745;
             color: white;
             padding: 12px;
             width: 100%;
@@ -73,12 +78,7 @@ if (isset($_GET['message'])) {
         }
 
         button:hover {
-            background-color: #0056b3;
-        }
-
-        .message {
-            margin-bottom: 15px;
-            font-weight: 600;
+            background-color: #218838;
         }
 
         .register-link {
@@ -98,19 +98,21 @@ if (isset($_GET['message'])) {
 </head>
 <body>
     <div class="login-container">
-        <h2>Subang Outdoor</h2>
+        <h2>Login Subang Outdoor</h2>
         <?php if ($message): ?>
             <div class="message" style="color: <?= $_GET['message'] === 'error' ? 'red' : 'green' ?>;">
                 <?= htmlspecialchars($message) ?>
             </div>
         <?php endif; ?>
         <form method="POST" action="prosesLogin.php">
-            <label>Username</label>
-            <input type="text" name="username" required>
-            
-            <label>Password</label>
-            <input type="password" name="password" required>
-            
+            <div>
+                <label for="username">Username</label>
+                <input type="text" name="username" id="username" placeholder="Masukkan username" required>
+            </div>
+            <div>
+                <label for="password">Password</label>
+                <input type="password" name="password" id="password" placeholder="Masukkan password" required>
+            </div>
             <button type="submit" name="login">Login</button>
         </form>
         <div class="register-link">

@@ -60,7 +60,7 @@ if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], ['owner', 'admin']
                                     <option value="" disabled selected>Pilih Kategori</option>
                                     <option value="tenda">Tenda</option>
                                     <option value="perlengkapan masak">Perlengkapan Masak</option>
-                                    <option value="perlengkapan">Perlengkapan Camping</option>
+                                    <option value="perlengkapan camping">Perlengkapan Camping</option>
                                 </select>
                             </div>
 

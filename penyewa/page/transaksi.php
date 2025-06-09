@@ -8,7 +8,6 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $id_penyewa = $_SESSION['user_id'];
-$id_penyewa_esc = mysqli_real_escape_string($koneksi, $id_penyewa);
 
 $query_transaksi = "
     SELECT t.*, mp.nama_metode, mp.gambar_metode, mp.nomor_rekening
@@ -26,21 +25,19 @@ $stmt->bind_param("i", $id_penyewa);
 $stmt->execute();
 $result_transaksi = $stmt->get_result();
 
-if (!$result_transaksi) {
-    die("Query gagal: " . $koneksi->error);
-}
-
 $status_map = [
-    'menunggu konfirmasi pembayaran' => ['bg-warning text-dark', 'Menunggu Konfirmasi Pembayaran'],
-    'Dikonfirmasi Pembayaran Silahkan AmbilBarang' => ['bg-success text-dark', 'Dikonfirmasi (Silahkan Ambil Barang)'],
-    'Ditolak Pembayaran' => ['bg-danger text-light', 'Ditolak Pembayaran'],
-    'selesai Pembayaran' => ['bg-success text-dark', 'Selesai Pembayaran'],
-    'disewa' => ['bg-info text-dark', 'Disewa / Di Ambil Barang'],
+    'Menunggu Konfirmasi Pembayaran' => ['bg-warning text-dark', 'Menunggu Konfirmasi Pembayaran'],
+    'Dikonfirmasi Pembayaran Silahkan AmbilBarang' => ['bg-success text-light', 'Dikonfirmasi (Silahkan Ambil Barang)'],
+    'menunggu konfirmasi pesanan'=>['bg-warning text-dark',],
+    'ditolak pembayaran' => ['bg-danger text-light', 'Ditolak Pembayaran'],
+    'elesai pembayaran' => ['bg-success text-dark', 'Selesai Pembayaran'],
+    'disewa' => ['bg-info text-dark', 'Disewa / Diambil Barang'],
     'terlambat dikembalikan' => ['bg-danger text-light', 'Terlambat Dikembalikan'],
     'menunggu konfirmasi pengembalian' => ['bg-warning text-dark', 'Menunggu Konfirmasi Pengembalian'],
     'ditolak pengembalian' => ['bg-danger text-light', 'Ditolak Pengembalian'],
-    'selesai dikembalikan' => ['bg-success text-dark', 'Selesai Dikembalikan'],
-    'batal' => ['bg-secondary', 'Batal'],
+    'Selesai Dikembalikan' => ['bg-success text-dark', 'Selesai Dikembalikan'],
+    'batal' => ['bg-secondary text-light', 'Batal'],
+    'belumbayar' => ['bg-warning text-dark', 'Belum Bayar']
 ];
 ?>
 
@@ -49,18 +46,13 @@ $status_map = [
 <head>
   <meta charset="UTF-8" />
   <title>Histori Transaksi - Subang Outdoor</title>
-  <link rel="stylesheet" href="css/linearicons.css">
-  <link rel="stylesheet" href="css/owl.carousel.css">
-  <link rel="stylesheet" href="css/font-awesome.min.css">
-  <link rel="stylesheet" href="css/themify-icons.css">
-  <link rel="stylesheet" href="css/nice-select.css">
-  <link rel="stylesheet" href="css/nouislider.min.css">
   <link rel="stylesheet" href="css/bootstrap.css">
   <link rel="stylesheet" href="css/main.css">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 <body>
 <?php include("../layout/navbar1.php"); ?>
+
 <section class="banner-area organic-breadcrumb">
   <div class="container">
     <div class="breadcrumb-banner d-flex flex-wrap align-items-center justify-content-end">
@@ -74,7 +66,7 @@ $status_map = [
   </div>
 </section>
 
-<div class="container mt-4 ">
+<div class="container mt-4">
   <h4>Histori Transaksi Anda</h4>
 
   <?php if ($result_transaksi->num_rows < 1): ?>
@@ -84,18 +76,17 @@ $status_map = [
   <div class="d-flex flex-wrap gap-4" style="gap: 10px;">
     <?php while ($transaksi = $result_transaksi->fetch_assoc()) : ?>
       <?php
-        $status = strtolower(trim($transaksi['status']));
-        $badge_class = $status_map[$status][0] ?? '';
+       $status = trim($transaksi['status']);
+
+        $badge_class = $status_map[$status][0] ?? 'bg-secondary';
         $status_text = $status_map[$status][1] ?? ucfirst($transaksi['status']);
       ?>
       <div class="card mb-4 shadow-sm p-3" style="min-width: 360px; max-width: 520px; flex: 1;">
         <div class="card-header d-flex justify-content-between align-items-center">
           <div>
             <strong>ID Transaksi: <?= htmlspecialchars($transaksi['id_transaksi']); ?></strong><br>
-            Status: 
-            <span class="badge <?= $badge_class; ?>">
-              <?= htmlspecialchars($status_text); ?>
-            </span><br>
+           Status: <span class="badge <?= $badge_class; ?>"><?= htmlspecialchars($status_text); ?></span><br>
+
             <small>Metode: <?= htmlspecialchars($transaksi['nama_metode']); ?></small>
           </div>
         </div>
@@ -151,44 +142,31 @@ $status_map = [
           <?php endif; ?>
 
           <div class="d-flex justify-content-between mt-3 align-items-center">
-  <div><strong>Total:</strong> Rp<?= number_format($transaksi['total_harga_sewa'], 0, ',', '.'); ?></div>
-  <div>
-    
-
-<?php
-$status_lc = strtolower(trim($transaksi['status']));
-$today = new DateTime();  // tanggal sekarang
-$tgl_kembali = new DateTime($transaksi['tanggal_kembali']);
-
-if ($status_lc === 'belumbayar') {
-?>
-    <form action="pembayaran.php" method="GET" class="d-inline">
-        <input type="hidden" name="id_transaksi" value="<?= htmlspecialchars($transaksi['id_transaksi']); ?>">
-        <button type="submit" class="btn btn-primary btn-sm">Bayar Sekarang</button>
-    </form>
-<?php
-} elseif (
-    in_array($status_lc, ['disewa', 'di ambil barang', 'terlambat dikembalikan']) &&
-    $today >= $tgl_kembali
-) {
-?>
-    <form action="pengembalian.php" method="GET" class="d-inline" onsubmit="return confirm('Yakin ingin mengembalikan barang?');">
-        <input type="hidden" name="id_transaksi" value="<?= htmlspecialchars($transaksi['id_transaksi']); ?>">
-        <button type="submit" class="btn btn-danger btn-sm">Kembalikan</button>
-    </form>
-<?php
-} else {
-    echo '<span class="text-success">Sudah dibayar</span>';
-}
-?>
-  </div>
-</div>
-
+            <div><strong>Total:</strong> Rp<?= number_format($transaksi['total_harga_sewa'], 0, ',', '.'); ?></div>
+            <div>
+              <?php if ($status === 'belumbayar'): ?>
+                <form action="pembayaran.php" method="GET" class="d-inline">
+                  <input type="hidden" name="id_transaksi" value="<?= htmlspecialchars($id_transaksi); ?>">
+                  <button type="submit" class="btn btn-primary btn-sm">Bayar Sekarang</button>
+                </form>
+              <?php elseif (in_array($status, ['disewa', 'terlambat dikembalikan'])): ?>
+                <form action="pengembalian.php" method="GET" class="d-inline" onsubmit="return confirm('Yakin ingin mengembalikan barang?');">
+                  <input type="hidden" name="id_transaksi" value="<?= htmlspecialchars($id_transaksi); ?>">
+                  <button type="submit" class="btn btn-danger btn-sm">Kembalikan</button>
+                </form>
+              <?php endif; ?>
+            </div>
+          </div>
         </div>
       </div>
     <?php endwhile; ?>
   </div>
 </div>
+
+<?php include ('../layout/footer.php'); ?>
+<script src="js/vendor/jquery-2.2.4.min.js"></script>
+<script src="js/vendor/bootstrap.min.js"></script>
+
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
 </body>
@@ -203,5 +181,4 @@ if ($status_lc === 'belumbayar') {
 <script src="js/owl.carousel.min.js"></script>
 <script src="js/gmaps.min.js"></script>
 <script src="js/main.js"></script>
-<?php include ('../layout/footer.php'); ?>
 </html>

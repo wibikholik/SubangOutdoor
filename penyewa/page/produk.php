@@ -17,10 +17,8 @@
     .unggulan-item {
       display: flex;
       align-items: center;
-      
       padding: 10px;
       margin-bottom: 10px;
-     
     }
 
     .unggulan-item img {
@@ -45,8 +43,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="shortcut icon" href="img/fav.png">
   <meta name="author" content="CodePixar">
-  <meta name="description" content="">
-  <meta name="keywords" content="">
   <meta charset="UTF-8">
   <title>Product - Subang Outdoor</title>
   <link rel="stylesheet" href="css/linearicons.css">
@@ -62,7 +58,7 @@
 
 <body id="category">
 
-  <?php include("../layout/navbar1.php")?>
+  <?php include("../layout/navbar1.php"); ?>
 
   <section class="banner-area organic-breadcrumb">
     <div class="container">
@@ -70,7 +66,7 @@
         <div class="col-first">
           <h1>Subang Outdoor</h1>
           <nav class="d-flex align-items-center">
-            <a href="#">Product</span></a>
+            <a href="#">Product</a>
           </nav>
         </div>
       </div>
@@ -81,57 +77,70 @@
     <div class="row">
       <!-- Katalog Produk -->
       <div class="col-xl-9 col-lg-8 col-md-7">
+
+        <?php
+        include '../../route/koneksi.php';
+
+        // Ambil parameter GET untuk filter
+        $kategori = isset($_GET['kategori']) ? $_GET['kategori'] : '';
+        $show = isset($_GET['show']) ? (int)$_GET['show'] : 12; // default 12 produk
+
+        // Buat kondisi WHERE jika kategori dipilih
+        $where = "";
+        if (!empty($kategori)) {
+          // Escape string untuk keamanan SQL injection
+          $kategori_escaped = mysqli_real_escape_string($koneksi, $kategori);
+          $where = "WHERE kategori = '$kategori_escaped'";
+        }
+
+        // Query mengambil data dengan filter dan limit jumlah produk
+        $query = "SELECT * FROM barang $where LIMIT $show";
+        $result = mysqli_query($koneksi, $query);
+        ?>
+
         <div class="filter-bar d-flex flex-wrap align-items-center">
-          <div class="sorting">
-            <select>
-              <option value="1">Default sorting</option>
-              <option value="2">Price: Low to High</option>
-              <option value="3">Price: High to Low</option>
-            </select>
-          </div>
-          <div class="sorting mr-auto">
-            <select>
-              <option value="12">Show 12</option>
-              <option value="24">Show 24</option>
-              <option value="36">Show 36</option>
-            </select>
-          </div>
-          <div class="pagination">
-            <a href="#" class="prev-arrow"><i class="fa fa-long-arrow-left" aria-hidden="true"></i></a>
-            <a href="#" class="active">1</a>
-            <a href="#">2</a>
-            <a href="#">3</a>
-            <a href="#" class="dot-dot"><i class="fa fa-ellipsis-h" aria-hidden="true"></i></a>
-            <a href="#">6</a>
-            <a href="#" class="next-arrow"><i class="fa fa-long-arrow-right" aria-hidden="true"></i></a>
-          </div>
+          <form method="GET" class="d-flex flex-wrap align-items-center w-100">
+            <div class="sorting me-3">
+              <select name="kategori" onchange="this.form.submit()">
+                <option value="" <?php if ($kategori == '') echo 'selected'; ?>>Semua Kategori</option>
+                <option value="Tenda" <?php if ($kategori == 'Tenda') echo 'selected'; ?>>Tenda</option>
+                <option value="Perlengkapan Camping" <?php if ($kategori == 'Perlengkapan Camping') echo 'selected'; ?>>Perlengkapan Camping</option>
+                <option value="Perlengkapan Masak" <?php if ($kategori == 'Perlengkapan Masak') echo 'selected'; ?>>Perlengkapan Masak</option>
+              </select>
+            </div>
+            <div class="sorting">
+              <select name="show" onchange="this.form.submit()">
+                <option value="12" <?php if ($show == 12) echo 'selected'; ?>>Show 12</option>
+                <option value="24" <?php if ($show == 24) echo 'selected'; ?>>Show 24</option>
+                <option value="36" <?php if ($show == 36) echo 'selected'; ?>>Show 36</option>
+              </select>
+            </div>
+          </form>
+
+
         </div>
 
         <section class="lattest-product-area pb-40 category-list">
           <div class="row">
             <?php
-            include '../../route/koneksi.php';
-            $query = "SELECT * FROM barang";
-            $result = mysqli_query($koneksi, $query);
-
             if (mysqli_num_rows($result) > 0) {
               while ($row = mysqli_fetch_assoc($result)) {
             ?>
-              <div class="col-lg-4 col-md-6">
-                <div class="single-product">
-                  <img class="img-fluid" src="../../barang/barang/gambar/<?php echo $row['gambar']; ?>" alt="<?php echo $row['nama_barang']; ?>">
-                  <div class="product-details">
-                    <h6><?php echo $row['nama_barang']; ?></h6>
-                    <div class="price">
-                      <h6>Rp <?php echo number_format($row['harga_sewa'], 0, ',', '.'); ?></h6>
+                <div class="col-lg-4 col-md-6">
+                  <div class="single-product">
+                    <img class="img-fluid" src="../../barang/barang/gambar/<?php echo $row['gambar']; ?>" alt="<?php echo $row['nama_barang']; ?>">
+                    <div class="product-details">
+                      <h6><?php echo $row['nama_barang']; ?></h6>
+                      <div class="price">
+                        <h6>Rp <?php echo number_format($row['harga_sewa'], 0, ',', '.'); ?></h6>
+                      </div>
+                      <button type="button" class="btn btn-dark w-100" data-bs-toggle="modal" data-bs-target="#keranjangModal<?php echo $row['id_barang']; ?>">
+                      Booking Sekarang
+                      </button>
                     </div>
-                    <button type="button" class="btn btn-dark w-100" data-bs-toggle="modal" data-bs-target="#keranjangModal<?php echo $row['id_barang']; ?>">
-                      Tambah ke Keranjang
-                    </button>
                   </div>
                 </div>
-              </div>
-              <?php include('../layout/modal.php'); ?>
+                <?php include('../layout/modal.php'); ?>
             <?php
               }
             } else {
@@ -153,13 +162,13 @@
           if (mysqli_num_rows($unggulanResult) > 0) {
             while ($row = mysqli_fetch_assoc($unggulanResult)) {
           ?>
-            <div class="unggulan-item">
-              <img src="../../barang/barang/gambar/<?php echo $row['gambar']; ?>" alt="<?php echo $row['nama_barang']; ?>">
-              <div>
-                <p class="mb-1 fw-semibold"><?php echo $row['nama_barang']; ?></p>
-                <p class="harga ">Rp <?php echo number_format($row['harga_sewa'], 0, ',', '.'); ?></p>
+              <div class="unggulan-item">
+                <img src="../../barang/barang/gambar/<?php echo $row['gambar']; ?>" alt="<?php echo $row['nama_barang']; ?>">
+                <div>
+                  <p class="mb-1 fw-semibold"><?php echo $row['nama_barang']; ?></p>
+                  <p class="harga">Rp <?php echo number_format($row['harga_sewa'], 0, ',', '.'); ?></p>
+                </div>
               </div>
-            </div>
           <?php
             }
           } else {
@@ -173,18 +182,27 @@
 
   <section class="related-product-area section_gap">
     <div class="container">
-      <div class="row justify-content-center">
-        <div class="col-lg-6 text-center">
-          <div class="section-title">
-            <h1>About Us</h1>
-            <p>Subang Outdoor merupakan mitra yang menyediakan perlengkapan camping dan kegiatan luar ruang yang berada di wilayah Subang. Sebagai UMKM yang fokus pada penyewaan alat-alat outdoor seperti tenda, matras, kompor portable, dan perlengkapan lainnya, Subang Outdoor berkomitmen untuk mendukung kegiatan alam yang aman, nyaman, dan terjangkau. Dengan semangat kolaborasi, kami bersama Subang Outdoor menghadirkan solusi digital untuk mempermudah proses pemesanan dan meningkatkan layanan bagi para pecinta alam.</p>
-          </div>
-        </div>
+  <div class="row align-items-center">
+    <!-- Kolom gambar -->
+    <div class="col-lg-6">
+      <img src="../layout/nature.jpg" alt="About Us" class="img-fluid">
+    </div>
+
+    <!-- Kolom teks About Us -->
+    <div class="col-lg-6">
+      <div class="section-title text-start">
+        <h1>About Us</h1>
+        <p>
+         Kami Hanya Menyediakan Proses Penyewaan lewat sistem,proses pengambilan barang sewaan silahkan mengambil ke toko kami subang Outdoor,Terimakasih
+        </p>
       </div>
     </div>
+  </div>
+</div>
+
   </section>
 
-  <?php include("../layout/footer.php")?>
+  <?php include("../layout/footer.php"); ?>
 
   <script src="js/vendor/jquery-2.2.4.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js"></script>

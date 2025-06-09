@@ -1,305 +1,225 @@
 <?php
 session_start();
+include '../route/koneksi.php';
 
-// Cek apakah sudah login dan role adalah admin
-if (!isset($_SESSION['user_id']) || !isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
-    header('Location: ../login.php');
-    exit;
+// Query barang dengan stok menipis
+$barang_menipis = mysqli_query($koneksi, "SELECT * FROM barang WHERE stok <= 5 ORDER BY stok ASC LIMIT 10");
+
+// Query penyewa top
+$penyewa_top = mysqli_query($koneksi, "
+    SELECT p.id_penyewa, p.nama_penyewa, COUNT(t.id_transaksi) AS total_transaksi
+    FROM penyewa p
+    LEFT JOIN transaksi t ON p.id_penyewa = t.id_penyewa
+    GROUP BY p.id_penyewa
+    ORDER BY total_transaksi DESC
+    LIMIT 5
+");
+
+// Grafik penyewaan (sewa selesai)
+$grafik_penyewaan = mysqli_query($koneksi, "
+    SELECT DATE_FORMAT(tanggal_sewa, '%Y-%m') AS bulan, COUNT(*) AS total_penyewaan
+    FROM transaksi
+    WHERE status = 'Selesai Dikembalikan'
+    GROUP BY bulan
+    ORDER BY bulan ASC
+");
+
+// Grafik pengembalian (tanggal_kembali dengan status selesai)
+$grafik_pengembalian = mysqli_query($koneksi, "
+    SELECT DATE_FORMAT(tanggal_kembali, '%Y-%m') AS bulan, COUNT(*) AS total_pengembalian
+    FROM transaksi
+    WHERE status = 'Selesai Dikembalikan' AND tanggal_kembali IS NOT NULL
+    GROUP BY bulan
+    ORDER BY bulan ASC
+");
+
+$labels_bulan = [];
+$data_penyewaan = [];
+$data_pengembalian = [];
+
+// Ambil data penyewaan
+while ($row = mysqli_fetch_assoc($grafik_penyewaan)) {
+    $labels_bulan[] = $row['bulan'];
+    $data_penyewaan[] = (int)$row['total_penyewaan'];
 }
 
-if (isset($_SESSION['success_message'])) {
-    echo "<script>alert('" . addslashes($_SESSION['success_message']) . "');</script>";
-    unset($_SESSION['success_message']);
+// Ambil data pengembalian ke array asosiasi per bulan
+$pengembalian_tmp = [];
+while ($row = mysqli_fetch_assoc($grafik_pengembalian)) {
+    $pengembalian_tmp[$row['bulan']] = (int)$row['total_pengembalian'];
 }
 
-$username = $_SESSION['username'];
+// Sesuaikan data pengembalian berdasarkan label bulan (jika tidak ada data, 0)
+foreach ($labels_bulan as $bulan) {
+    $data_pengembalian[] = $pengembalian_tmp[$bulan] ?? 0;
+}
+
+// Ringkasan
+$total_penyewa = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) AS total FROM penyewa"))['total'];
+$total_admin = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) AS total FROM admin"))['total'];
+$total_barang = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) AS total FROM barang"))['total'];
+$total_barang_disewa = mysqli_fetch_assoc(mysqli_query($koneksi, "
+    SELECT SUM(dt.jumlah_barang) AS total 
+    FROM detail_transaksi dt 
+    JOIN transaksi t ON dt.id_transaksi = t.id_transaksi 
+    WHERE t.status = 'Disewa'
+"))['total'] ?? 0;
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="id">
 <head>
-
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="">
-    <meta name="author" content="">
-
-    <title>Subang Outdoor - Dashboard</title>
-
-    <!-- Custom fonts for this template-->
-    <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
-    <link
-        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
-        rel="stylesheet">
-
-    <!-- Custom styles for this template-->
-    <link href="../assets/css/sb-admin-2.min.css" rel="stylesheet">
-
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dashboard - Subang Outdoor</title>
+    <link href="../assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" />
+    <link href="../assets/css/sb-admin-2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-
 <body id="page-top">
+<div id="wrapper">
+    <?php include '../layout/sidebar.php'; ?>
 
-    <!-- Page Wrapper -->
-    <div id="wrapper">
+    <div id="content-wrapper" class="d-flex flex-column">
+        <div id="content">
+            <?php include '../layout/navbar.php'; ?>
 
-        <!-- Sidebar -->
-       <?php include '../layout/sidebar.php';?>
-        <!-- End of Sidebar -->
+            <div class="container-fluid">
+                <h1 class="h3 mb-4 text-gray-800">Dashboard</h1>
 
-        <!-- Content Wrapper -->
-        <div id="content-wrapper" class="d-flex flex-column">
-
-            <!-- Main Content -->
-            <div id="content">
-
-                <!-- Topbar -->
-               <?php include '../layout/navbar.php';?>
-                <!-- End of Topbar -->
-
-                <!-- Begin Page Content -->
-                <div class="container-fluid">
-
-                    <!-- Page Heading -->
-                    <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                        <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
-                    </div>
-
-                    <!-- Content Row -->
-                    <div class="row">
-
-                        <!-- Earnings (Monthly) Card Example -->
+                <div class="row">
+                    <!-- Kartu Ringkasan -->
+                    <?php
+                    $ringkasan = [
+                        ['title' => 'Penyewa Terdaftar', 'total' => $total_penyewa, 'icon' => 'fa-users', 'color' => 'primary'],
+                        ['title' => 'Barang Tersedia', 'total' => $total_barang, 'icon' => 'fa-boxes', 'color' => 'warning'],
+                        ['title' => 'Total Barang Disewa', 'total' => $total_barang_disewa, 'icon' => 'fa-shopping-cart', 'color' => 'danger'],
+                    ];
+                    foreach ($ringkasan as $data): ?>
                         <div class="col-xl-3 col-md-6 mb-4">
-                            <div class="card border-left-success shadow h-100 py-2">
+                            <div class="card border-left-<?= $data['color'] ?> shadow h-100 py-2">
                                 <div class="card-body">
                                     <div class="row no-gutters align-items-center">
                                         <div class="col mr-2">
-                                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                                Penjualan</div>
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800">Rp.1.000.000</div>
+                                            <div class="text-xs font-weight-bold text-<?= $data['color'] ?> text-uppercase mb-1"><?= $data['title'] ?></div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800"><?= $data['total'] ?></div>
                                         </div>
                                         <div class="col-auto">
-                                            <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                                            <i class="fas <?= $data['icon'] ?> fa-2x text-gray-300"></i>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Earnings (Monthly) Card Example -->
-                        <div class="col-xl-3 col-md-6 mb-4">
-                            <div class="card border-left-warning shadow h-100 py-2">
-                                <div class="card-body">
-                                    <div class="row no-gutters align-items-center">
-                                        <div class="col mr-2">
-                                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                                Karyawan</div>
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800">10</div>
-                                        </div>
-                                        <div class="col-auto">
-                                            <i class="fas fa-users fa-2x text-gray-300"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Earnings (Monthly) Card Example -->
-                        <div class="col-xl-3 col-md-6 mb-4">
-                            <div class="card border-left-info shadow h-100 py-2">
-                                <div class="card-body">
-                                    <div class="row no-gutters align-items-center">
-                                        <div class="col mr-2">
-                                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
-                                                pelanggan terdaftar</div>
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800">10</div>
-                                        </div>
-                                        <div class="col-auto">
-                                            <i class="fas fa-user fa-2x text-gray-300"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-
-                        <!-- Pending Requests Card Example -->
-                        <div class="col-xl-3 col-md-6 mb-4">
-                            <div class="card border-left-primary shadow h-100 py-2">
-                                <div class="card-body">
-                                    <div class="row no-gutters align-items-center">
-                                        <div class="col mr-2">
-                                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                                Total Barang</div>
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800">10</div>
-                                        </div>
-                                        <div class="col-auto">
-                                            <i class="fas fa-box fa-2x text-gray-300"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Content Row -->
-
-                    <div class="row">
-
-                        <!-- Area Chart -->
-                        <div class="col-xl-8 col-lg-7">
-                            <div class="card shadow mb-4">
-                                <!-- Card Header - Dropdown -->
-                                <div
-                                    class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                                    <h6 class="m-0 font-weight-bold text-primary">Peninjau Penghasilan</h6>
-                                    <div class="dropdown no-arrow">
-                                    </div>
-                                </div>
-                                <!-- Card Body -->
-                                <div class="card-body">
-                                    <div class="chart-area">
-                                        <canvas id="myAreaChart"></canvas>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Pie Chart -->
-                        <div class="col-xl-4 col-lg-5">
-                            <div class="card shadow mb-4">
-                                <!-- Card Header - Dropdown -->
-                                <div
-                                    class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                                    <h6 class="m-0 font-weight-bold text-primary">Pencapaian penjualan</h6>
-                                </div>
-                                <!-- Card Body -->
-                                <div class="card-body">
-                                    <div class="chart-pie pt-4 pb-2">
-                                        <canvas id="myPieChart"></canvas>
-                                    </div>
-                                    <div class="mt-4 text-center small">
-                                        <span class="mr-2">
-                                            <i class="fas fa-circle text-primary"></i> Direct
-                                        </span>
-                                        <span class="mr-2">
-                                            <i class="fas fa-circle text-success"></i> Social
-                                        </span>
-                                        <span class="mr-2">
-                                            <i class="fas fa-circle text-info"></i> Referral
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- DataTales Example -->
-                    <div class="card shadow mb-4">
-                        <div class="card-header py-3">
-                            <h6 class="m-0 font-weight-bold text-primary">Histori Transaksi</h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                                    <thead>
-                                        <tr>
-                                            <th>Nama penyewa</th>
-                                            <th>Metode Pembayaran</th>
-                                            <th>Total Harga</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>Bugar</td>
-                                            <td>Dana</td>
-                                            <td>Rp.100.000</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Bugar</td>
-                                            <td>Dana</td>
-                                            <td>Rp.100.000</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Bugar</td>
-                                            <td>Dana</td>
-                                            <td>Rp.100.000</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-
-
-                        </div>
-                    </div>
-
+                    <?php endforeach; ?>
                 </div>
-                <!-- /.container-fluid -->
 
-            </div>
-            <!-- End of Main Content -->
-
-            <!-- Footer -->
-            <footer class="sticky-footer bg-white">
-                <div class="container my-auto">
-                    <div class="copyright text-center my-auto">
-                        <span>Copyright &copy; Subang Outdoor 2025</span>
+                <!-- Stok Menipis -->
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-primary">Barang dengan Stok Menipis (≤ 5)</h6></div>
+                    <div class="card-body">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr><th>ID Barang</th><th>Nama Barang</th><th>Stok</th></tr>
+                            </thead>
+                            <tbody>
+                                <?php if (mysqli_num_rows($barang_menipis) > 0): ?>
+                                    <?php while ($row = mysqli_fetch_assoc($barang_menipis)): ?>
+                                        <tr>
+                                            <td><?= htmlspecialchars($row['id_barang']) ?></td>
+                                            <td><?= htmlspecialchars($row['nama_barang']) ?></td>
+                                            <td><?= (int)$row['stok'] ?></td>
+                                        </tr>
+                                    <?php endwhile; ?>
+                                <?php else: ?>
+                                    <tr><td colspan="3" class="text-center">Tidak ada barang dengan stok menipis.</td></tr>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-            </footer>
-            <!-- End of Footer -->
 
-        </div>
-        <!-- End of Content Wrapper -->
-
-    </div>
-    <!-- End of Page Wrapper -->
-
-    <!-- Scroll to Top Button-->
-    <a class="scroll-to-top rounded" href="#page-top">
-        <i class="fas fa-angle-up"></i>
-    </a>
-
-    <!-- Logout Modal-->
-    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
-                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
+                <!-- Penyewa Top -->
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-success">Penyewa Teratas</h6></div>
+                    <div class="card-body">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr><th>ID Penyewa</th><th>Nama Penyewa</th><th>Total Transaksi</th></tr>
+                            </thead>
+                            <tbody>
+                                <?php if (mysqli_num_rows($penyewa_top) > 0): ?>
+                                    <?php while ($row = mysqli_fetch_assoc($penyewa_top)): ?>
+                                        <tr>
+                                            <td><?= htmlspecialchars($row['id_penyewa']) ?></td>
+                                            <td><?= htmlspecialchars($row['nama_penyewa']) ?></td>
+                                            <td><?= (int)$row['total_transaksi'] ?></td>
+                                        </tr>
+                                    <?php endwhile; ?>
+                                <?php else: ?>
+                                    <tr><td colspan="3" class="text-center">Belum ada data penyewa.</td></tr>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-                <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
-                <div class="modal-footer">
-                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                    <a class="btn btn-primary" href="login.html">Logout</a>
+
+                <!-- Grafik Penyewaan dan Pengembalian -->
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-info">Grafik Penyewaan & Pengembalian per Bulan</h6></div>
+                    <div class="card-body">
+                       <canvas id="grafikPenyewaan" height="100"></canvas>
+                    </div>
                 </div>
+
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Bootstrap core JavaScript-->
-    <script src="vendor/jquery/jquery.min.js"></script>
-    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- Scripts -->
+<script src="../assets/vendor/jquery/jquery.min.js"></script>
+<script src="../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="../assets/vendor/jquery-easing/jquery.easing.min.js"></script>
+<script src="../assets/js/sb-admin-2.min.js"></script>
 
-    <!-- Core plugin JavaScript-->
-    <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
-
-    <!-- Custom scripts for all pages-->
-    <script src="js/sb-admin-2.min.js"></script>
-
-    <!-- Page level plugins -->
-    <script src="vendor/chart.js/Chart.min.js"></script>
-
-    <!-- Page level custom scripts -->
-    <script src="js/demo/chart-area-demo.js"></script>
-    <script src="js/demo/chart-pie-demo.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const ctx = document.getElementById('grafikPenyewaan').getContext('2d');
+new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: <?= json_encode($labels_bulan) ?>,
+        datasets: [
+            {
+                label: 'Jumlah Penyewaan',
+                data: <?= json_encode($data_penyewaan) ?>,
+                borderColor: '#4e73df',
+                backgroundColor: 'rgba(78, 115, 223, 0.1)',
+                fill: true,
+                tension: 0.3
+            },
+            {
+                label: 'Jumlah Pengembalian',
+                data: <?= json_encode($data_pengembalian) ?>,
+                borderColor: '#1cc88a',
+                backgroundColor: 'rgba(28, 200, 138, 0.1)',
+                fill: true,
+                tension: 0.3
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        scales: {
+            y: {
+                beginAtZero: true,
+                precision: 0
+            }
+        }
+    }
+});
+</script>
 
 </body>
-
 </html>
