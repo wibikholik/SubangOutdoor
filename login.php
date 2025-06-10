@@ -72,6 +72,38 @@ if (isset($_GET['message'])) {
             box-sizing: border-box;
         }
 
+        .password-container {
+            position: relative;
+        }
+
+        .password-container input {
+            padding-right: 40px;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            top: 38px;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .forgot-password {
+            text-align: right;
+            font-size: 13px;
+            margin-top: -15px;
+            margin-bottom: 20px;
+        }
+
+        .forgot-password a {
+            color: #007BFF;
+            text-decoration: none;
+        }
+
+        .forgot-password a:hover {
+            text-decoration: underline;
+        }
+
         button {
             background-color: #28a745;
             color: white;
@@ -117,9 +149,13 @@ if (isset($_GET['message'])) {
                 <label for="username">Username</label>
                 <input type="text" name="username" id="username" placeholder="Masukkan username" required>
             </div>
-            <div>
+            <div class="password-container">
                 <label for="password">Password</label>
                 <input type="password" name="password" id="password" placeholder="Masukkan password" required>
+                <span id="togglePassword" class="toggle-password">👁️</span>
+            </div>
+            <div class="forgot-password">
+                <a href="lupa_password.php">Lupa password?</a>
             </div>
             <button type="submit" name="login">Login</button>
         </form>
@@ -127,5 +163,16 @@ if (isset($_GET['message'])) {
             Belum punya akun? <a href="register.php">Daftar di sini</a>
         </div>
     </div>
+
+    <script>
+        const togglePassword = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('password');
+
+        togglePassword.addEventListener('click', function () {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            this.textContent = type === 'password' ? '👁️' : '🙈';
+        });
+    </script>
 </body>
 </html>
