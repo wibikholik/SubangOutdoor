@@ -1,6 +1,6 @@
 <?php
 // Koneksi ke database
-$koneksi = mysqli_connect("localhost", "root", "", "subangoutdoor3");
+include 'route/koneksi.php';
 
 $message = '';
 

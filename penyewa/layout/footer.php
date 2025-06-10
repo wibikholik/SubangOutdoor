@@ -13,7 +13,7 @@
 					<div class="single-footer-widget">
 						<h6>Contact Us</h6>
 						<p>	Email : Subangoutdoor@gmail.com<br>
-							WhatsApp : 0823-1988-8249<br>
+							WhatsApp : 0853-5131-5532<br>
 							Instagram : sewaalatcampingsubang
 					</p>
 						<div class="" id="mc_embed_signup">
