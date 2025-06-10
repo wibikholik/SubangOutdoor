@@ -9,9 +9,8 @@ if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], ['admin', 'owner']
 }
 
 $username = $_SESSION['username'];
-$query = "SELECT * FROM barang";
+$query = "SELECT * FROM barang ORDER BY id_barang DESC"; // Tampilkan dari terbaru
 $result = mysqli_query($koneksi, $query);
-
 // Notifikasi pesan
 $message = '';
 if (isset($_GET['pesan'])) {
@@ -148,9 +147,10 @@ if (isset($_GET['pesan'])) {
     <script src="../assets/vendor/datatables/jquery.dataTables.min.js"></script>
     <script src="../assets/vendor/datatables/dataTables.bootstrap4.min.js"></script>
     <script>
-        $(document).ready(function () {
-            $('#dataTable').DataTable();
-        });
+        $('#dataTable').DataTable({
+    "order": [[0, "desc"]] // kolom ke-0 = ID, urutkan descending
+});
+
     </script>
 </body>
 

@@ -22,7 +22,7 @@ if (isset($_GET['pesan'])) {
 }
 
 // Ambil data penyewa dari database
-$query = "SELECT * FROM metode_pembayaran";
+$query = "SELECT * FROM metode_pembayaran ORDER BY id_metode DESC";
 $result = mysqli_query($koneksi, $query);
 ?>
 

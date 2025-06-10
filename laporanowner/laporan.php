@@ -10,14 +10,16 @@ if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], ['owner'])) {
 
 // Fungsi bantu untuk ambil total
 function getTotalByPeriod($koneksi, $interval) {
-    $query = "SELECT SUM(total_harga_sewa) AS total 
-              FROM transaksi 
-              WHERE status = 'Selesai Dikembalikan' 
-              AND tanggal_sewa >= DATE_SUB(CURDATE(), INTERVAL $interval)";
+    $query = "SELECT SUM(t.total_harga_sewa) AS total 
+              FROM transaksi t
+              JOIN pengembalian p ON t.id_transaksi = p.id_transaksi
+              WHERE t.status = 'Selesai Dikembalikan' 
+              AND p.tanggal_pengembalian >= DATE_SUB(CURDATE(), INTERVAL $interval)";
     $result = mysqli_query($koneksi, $query);
     $data = mysqli_fetch_assoc($result);
     return $data['total'] ?? 0;
 }
+
 
 // Data ringkasan
 $total_harian = getTotalByPeriod($koneksi, "1 DAY");
@@ -27,9 +29,10 @@ $total_tahunan = getTotalByPeriod($koneksi, "1 YEAR");
 
 // Data tabel transaksi selesai
 $transaksi = mysqli_query($koneksi, "SELECT * FROM transaksi 
-                                     JOIN metode_pembayaran ON transaksi.id_metode = metode_pembayaran.id_metode 
-                                     WHERE status = 'Selesai Dikembalikan' 
-                                     ORDER BY tanggal_sewa DESC");
+    JOIN metode_pembayaran ON transaksi.id_metode = metode_pembayaran.id_metode 
+    WHERE status = 'Selesai Dikembalikan' 
+    ORDER BY transaksi.id_transaksi DESC");
+
 
 // Data sumber penghasilan untuk chart
 $chart = mysqli_query($koneksi, "SELECT metode_pembayaran.nama_metode, SUM(transaksi.total_harga_sewa) AS total 

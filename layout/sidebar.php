@@ -8,7 +8,7 @@ $username = $_SESSION['username'] ?? 'Guest';
     <!-- Sidebar - Brand -->
     <a class="sidebar-brand d-flex align-items-center justify-content-center" href="#">
         <div class="sidebar-brand-icon">
-            <img src="../assets/img/pinguin.jpg" alt="Logo" style="width: 50px; height: 50px; border-radius: 50%;">
+            <img src="../assets/img/logo.jpg" alt="Logo" style="width: 50px; height: 50px; border-radius: 50%;">
         </div>
         <div class="sidebar-brand-text mx-3">Subang Outdoor</div>
     </a>

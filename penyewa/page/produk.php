@@ -180,28 +180,7 @@
     </div>
   </div>
 
-  <section class="related-product-area section_gap">
-    <div class="container">
-  <div class="row align-items-center">
-    <!-- Kolom gambar -->
-    <div class="col-lg-6">
-      <img src="../layout/nature.jpg" alt="About Us" class="img-fluid">
-    </div>
-
-    <!-- Kolom teks About Us -->
-    <div class="col-lg-6">
-      <div class="section-title text-start">
-        <h1>About Us</h1>
-        <p>
-         Kami Hanya Menyediakan Proses Penyewaan lewat sistem,proses pengambilan barang sewaan silahkan mengambil ke toko kami subang Outdoor,Terimakasih
-        </p>
-      </div>
-    </div>
-  </div>
-</div>
-
-  </section>
-
+  
   <?php include("../layout/footer.php"); ?>
 
   <script src="js/vendor/jquery-2.2.4.min.js"></script>

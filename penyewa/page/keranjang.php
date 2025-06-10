@@ -64,7 +64,7 @@ $id_penyewa = $_SESSION['user_id'];
                         <h5>SUBANG OUTDOOR | Keranjang Belanja</h5>
 
                         <?php
-                            $query = "SELECT carts.id, barang.gambar, barang.nama_barang, carts.jumlah, carts.harga
+                            $query = "SELECT carts.id, barang.gambar, barang.nama_barang, carts.jumlah, barang.harga_sewa
                                       FROM carts
                                       JOIN barang ON carts.id_barang = barang.id_barang
                                       WHERE carts.id_penyewa = '$id_penyewa'";
@@ -92,7 +92,7 @@ $id_penyewa = $_SESSION['user_id'];
 
                                 $no = 0;
                                 while ($row = mysqli_fetch_assoc($result)) {
-                                    $subtotal = $row['jumlah'] * $row['harga'];
+                                    $subtotal = $row['harga_sewa']*$row['jumlah'];
                                     $id_cart = $row['id'];
 
                                     echo '<tr>
@@ -100,9 +100,9 @@ $id_penyewa = $_SESSION['user_id'];
                                         <td><img src="../../barang/barang/gambar/' . $row['gambar'] . '" alt="' . htmlspecialchars($row['nama_barang']) . '" style="width: 80px;"></td>
                                         <td>' . htmlspecialchars($row['nama_barang']) . '</td>
                                         <td>
-                                          <input type="number" class="form-control quantity-input" name="jumlah[' . $id_cart . ']" value="' . $row['jumlah'] . '" min="1" data-price="' . $row['harga'] . '" onchange="updateSubtotal(this); updateTotal()" />
+                                          <input type="number" class="form-control quantity-input" name="jumlah[' . $id_cart . ']" value="' . $row['jumlah'] . '" min="1" data-price="' . $row['harga_sewa'] . '" onchange="updateSubtotal(this); updateTotal()" />
                                         </td>
-                                        <td>Rp. ' . number_format($row['harga'], 0, ",", ".") . '</td>
+                                        <td>Rp. ' . number_format($row['harga_sewa'], 0, ",", ".") . '</td>
                                         <td class="subtotal">Rp. ' . number_format($subtotal, 0, ",", ".") . '</td>
                                         <td><a href="../controller/hapus.php?id=' . $id_cart . '" class="btn btn-danger btn-sm" onclick="return confirm(\'Yakin ingin hapus?\')">Hapus</a></td>
                                       </tr>';

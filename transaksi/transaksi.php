@@ -46,28 +46,31 @@ while ($row = mysqli_fetch_assoc($result_detail)) {
 
 // Fungsi untuk badge bootstrap berdasarkan status transaksi
 function getBadgeClass($status) {
-    switch (strtolower(trim($status))) {
+    $status = strtolower(trim($status));
+    switch ($status) {
         case 'selesai dikembalikan':
         case 'transaksi selesai':
-            return 'success'; // hijau
+            return 'success';
         case 'disewa':
-            return 'info'; // biru muda
+            return 'info';
         case 'di ambil barang':
-            return 'warning'; // kuning
+            return 'warning';
         case 'terlambat dikembalikan':
         case 'ditolak pengembalian':
-            return 'danger'; // merah
+            return 'danger';
         case 'menunggu konfirmasi pembayaran':
         case 'menunggu konfirmasi pengembalian':
-            return 'warning'; // kuning
-        case 'Dikonfirmasi Pembayaran Silahkan AmbilBarang':
-            return 'primary'; // biru tua
+            return 'warning';
+        case 'dikonfirmasi pembayaran silahkan ambilbarang':
+            return 'primary';
         case 'batal':
-            return 'secondary'; // abu-abu
+            return 'secondary';
         default:
-            return 'secondary'; // default abu-abu
+            error_log("Status tidak dikenal: $status"); // catat di log server
+            return 'secondary';
     }
 }
+
 ?>
 
 <!DOCTYPE html>
