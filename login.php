@@ -17,18 +17,26 @@ if (isset($_GET['message'])) {
     <meta charset="UTF-8">
     <title>Login</title>
     <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f0f2f5;
+            background-image: url('assets/img/bekgrun.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            margin: 0;
+            min-height: 100vh;
         }
 
         .login-container {
-            background: #fff;
+            background: rgba(255, 255, 255, 0.95);
             padding: 30px 35px;
             border-radius: 12px;
             box-shadow: 0 0 15px rgba(0,0,0,0.1);
@@ -117,9 +125,6 @@ if (isset($_GET['message'])) {
         </form>
         <div class="register-link">
             Belum punya akun? <a href="register.php">Daftar di sini</a>
-        </div>
-        <div class="register-link">
-            Lupa  Password? <a href="register.php">reset di sini</a>
         </div>
     </div>
 </body>
