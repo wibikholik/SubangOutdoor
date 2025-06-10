@@ -81,32 +81,39 @@
         <?php
         include '../../route/koneksi.php';
 
-        // Ambil parameter GET untuk filter
-        $kategori = isset($_GET['kategori']) ? $_GET['kategori'] : '';
-        $show = isset($_GET['show']) ? (int)$_GET['show'] : 12; // default 12 produk
+      
+$kategori = isset($_GET['kategori']) ? (int)$_GET['kategori'] : 0;
+$show = isset($_GET['show']) ? (int)$_GET['show'] : 12;
 
-        // Buat kondisi WHERE jika kategori dipilih
-        $where = "";
-        if (!empty($kategori)) {
-          // Escape string untuk keamanan SQL injection
-          $kategori_escaped = mysqli_real_escape_string($koneksi, $kategori);
-          $where = "WHERE kategori = '$kategori_escaped'";
-        }
+// Validasi nilai show (12,24,36)
+if (!in_array($show, [12, 24, 36])) {
+  $show = 12;
+}
 
-        // Query mengambil data dengan filter dan limit jumlah produk
-        $query = "SELECT * FROM barang $where LIMIT $show";
-        $result = mysqli_query($koneksi, $query);
+// Ambil daftar kategori untuk dropdown
+$kategoriResult = mysqli_query($koneksi, "SELECT * FROM kategori ORDER BY nama_kategori ASC");
+
+$where = "";
+if ($kategori > 0) {
+  $where = "WHERE id_kategori = $kategori";
+}
+
+$query = "SELECT * FROM barang $where LIMIT $show";
+$result = mysqli_query($koneksi, $query);
+
         ?>
 
-        <div class="filter-bar d-flex flex-wrap align-items-center">
-          <form method="GET" class="d-flex flex-wrap align-items-center w-100">
+        <div class="filter-bar d-flex flex-wrap align-items-center mb-3">
+          <form method="GET" class="d-flex flex-wrap align-items-center w-100" role="search">
             <div class="sorting me-3">
-              <select name="kategori" onchange="this.form.submit()">
-                <option value="" <?php if ($kategori == '') echo 'selected'; ?>>Semua Kategori</option>
-                <option value="Tenda" <?php if ($kategori == 'Tenda') echo 'selected'; ?>>Tenda</option>
-                <option value="Perlengkapan Camping" <?php if ($kategori == 'Perlengkapan Camping') echo 'selected'; ?>>Perlengkapan Camping</option>
-                <option value="Perlengkapan Masak" <?php if ($kategori == 'Perlengkapan Masak') echo 'selected'; ?>>Perlengkapan Masak</option>
-              </select>
+             <select name="kategori" class="form-select" onchange="this.form.submit()">
+  <option value="0" <?php if ($kategori == 0) echo 'selected'; ?>>Semua Kategori</option>
+  <?php while ($kat = mysqli_fetch_assoc($kategoriResult)) : ?>
+    <option value="<?php echo $kat['id_kategori']; ?>" <?php if ($kategori == $kat['id_kategori']) echo 'selected'; ?>>
+      <?php echo htmlspecialchars($kat['nama_kategori']); ?>
+    </option>
+  <?php endwhile; ?>
+</select>
             </div>
             <div class="sorting">
               <select name="show" onchange="this.form.submit()">
