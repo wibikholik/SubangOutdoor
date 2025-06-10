@@ -72,7 +72,7 @@ if ($id_penyewa) {
 						<ul class="nav navbar-nav navbar-right">  
                         <li class="nav-item d-flex align-items-center gap-2">
                             <!-- Bungkus ikon dan badge dalam div dengan posisi relatif -->
-                            <a href="../page/keranjang.php" title="Keranjang" style="position: relative; display: inline-block;">
+                            <a href="/subangoutdoor/penyewa/page/keranjang.php" title="Keranjang" style="position: relative; display: inline-block;">
                             <i class="fas fa-shopping-cart fa-lg"></i>
                             <?php if ($jumlah_cart > 0): ?>
                                 <span class="cart-badge"><?= $jumlah_cart ?></span>
