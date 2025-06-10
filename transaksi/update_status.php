@@ -143,54 +143,62 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt_items->close();
 
             // Ambil data email, nama penyewa dan tanggal kembali
-            $query_email = "SELECT p.email, p.nama_penyewa, t.tanggal_kembali FROM transaksi t 
-                            JOIN penyewa p ON t.id_penyewa = p.id_penyewa
-                            WHERE t.id_transaksi = ?";
+           $query_email = "SELECT p.email, p.nama_penyewa, t.tanggal_kembali 
+                FROM transaksi t 
+                JOIN penyewa p ON t.id_penyewa = p.id_penyewa
+                WHERE t.id_transaksi = ?";
+                
             $stmt_email = $koneksi->prepare($query_email);
             if (!$stmt_email) {
                 die("Gagal prepare statement ambil data user: " . $koneksi->error);
             }
+
             $stmt_email->bind_param("i", $id);
             if (!$stmt_email->execute()) {
                 die("Gagal execute query ambil data user: " . $stmt_email->error);
             }
+
             $result_email = $stmt_email->get_result();
             $row_email = $result_email->fetch_assoc();
             $stmt_email->close();
 
-            if ($row_email) {
+            if ($row_email && !empty($row_email['email']) && filter_var($row_email['email'], FILTER_VALIDATE_EMAIL)) {
                 $email = $row_email['email'];
                 $nama_penyewa = $row_email['nama_penyewa'];
                 $tanggal_kembali = $row_email['tanggal_kembali'];
 
                 // Kirim email konfirmasi ambil barang
-                $mail = new PHPMailer(true);
-                try {
-                    $mail->isSMTP();
-                    $mail->Host = 'smtp.gmail.com';
-                    $mail->SMTPAuth = true;
-                    $mail->Username   = 'subangoutdoortes@gmail.com';  // Ganti dengan email pengirim Anda
-                    $mail->Password   = 'sbsn ajtg fgox otra';          // Ganti dengan password email Anda
-                    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-                    $mail->Port = 587;
+               $mail = new PHPMailer(true);
+try {
+    $mail->SMTPDebug = 2; // debug SMTP
+    $mail->Debugoutput = 'html';
 
-                    $mail->setFrom('subangoutdoortes@gmail.com', 'Subang Outdoor');
-                    $mail->addAddress($email, $nama_penyewa);
+    $mail->isSMTP();
+    $mail->Host = 'smtp.gmail.com';
+    $mail->SMTPAuth = true;
+    $mail->Username   = 'subangoutdoortes@gmail.com';
+    $mail->Password   = 'sbsn ajtg fgox otra';
+    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+    $mail->Port = 587;
 
-                    $mail->isHTML(true);
-                    $mail->Subject = 'Barang Siap Diambil';
-                    $mail->Body = "
-                        <h3>Halo, $nama_penyewa!</h3>
-                        <p>Pesanan Anda telah <strong>dikonfirmasi</strong> dan barang sudah siap diambil.</p>
-                        <p>Silakan segera datang untuk mengambil barang sewaan Anda.</p>
-                        <p>Terima kasih telah menggunakan layanan kami.</p>
-                        <br>
-                        <small>Subang Outdoor Team</small>
-                    ";
-                    $mail->send();
-                } catch (Exception $e) {
-                    error_log("Gagal mengirim email ambil barang: {$mail->ErrorInfo}");
-                }
+    $mail->setFrom('subangoutdoortes@gmail.com', 'Subang Outdoor');
+    $mail->addAddress($email, $nama_penyewa);
+
+    $mail->isHTML(true);
+    $mail->Subject = 'Barang Siap Diambil';
+    $mail->Body = "
+        <h3>Halo, $nama_penyewa!</h3>
+        <p>Pesanan Anda telah <strong>dikonfirmasi</strong> dan barang sudah siap diambil.</p>
+        <p>Silakan segera datang untuk mengambil barang sewaan Anda.</p>
+        <p>Terima kasih telah menggunakan layanan kami.</p>
+        <br>
+        <small>Subang Outdoor Team</small>
+    ";
+
+    $mail->send();
+} catch (Exception $e) {
+    error_log("Gagal mengirim email ambil barang: {$mail->ErrorInfo}");
+}
             }
         }
 
@@ -258,6 +266,59 @@ $diff = (int)$hari_ini->diff($tgl_kembali)->format("%r%a");
             }
         }
     }
+// Jika status baru adalah "selesai dikembalikan", kirim email ucapan terima kasih
+if (strtolower($status_baru) === strtolower('Selesai Dikembalikan')) {
+    // Ambil data email dan nama penyewa
+    $query_email_thanks = "SELECT p.email, p.nama_penyewa 
+                           FROM transaksi t 
+                           JOIN penyewa p ON t.id_penyewa = p.id_penyewa
+                           WHERE t.id_transaksi = ?";
+    $stmt_email_thanks = $koneksi->prepare($query_email_thanks);
+    if (!$stmt_email_thanks) {
+        die("Gagal prepare statement ambil data user untuk ucapan terima kasih: " . $koneksi->error);
+    }
+    $stmt_email_thanks->bind_param("i", $id);
+    if (!$stmt_email_thanks->execute()) {
+        die("Gagal execute query ambil data user untuk ucapan terima kasih: " . $stmt_email_thanks->error);
+    }
+    $result_email_thanks = $stmt_email_thanks->get_result();
+    $row_email_thanks = $result_email_thanks->fetch_assoc();
+    $stmt_email_thanks->close();
+
+    if ($row_email_thanks && !empty($row_email_thanks['email']) && filter_var($row_email_thanks['email'], FILTER_VALIDATE_EMAIL)) {
+        $email_thanks = $row_email_thanks['email'];
+        $nama_penyewa_thanks = $row_email_thanks['nama_penyewa'];
+
+        $mail_thanks = new PHPMailer(true);
+        try {
+            $mail_thanks->isSMTP();
+            $mail_thanks->Host = 'smtp.gmail.com';
+            $mail_thanks->SMTPAuth = true;
+            $mail_thanks->Username   = 'subangoutdoortes@gmail.com';
+            $mail_thanks->Password   = 'sbsn ajtg fgox otra';
+            $mail_thanks->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+            $mail_thanks->Port = 587;
+
+            $mail_thanks->setFrom('subangoutdoortes@gmail.com', 'Subang Outdoor');
+            $mail_thanks->addAddress($email_thanks, $nama_penyewa_thanks);
+
+            $mail_thanks->isHTML(true);
+            $mail_thanks->Subject = 'Terima Kasih Telah Menggunakan Layanan Kami';
+            $mail_thanks->Body = "
+                <h3>Halo, $nama_penyewa_thanks!</h3>
+                <p>Terima kasih telah mengembalikan barang sewa tepat waktu.</p>
+                <p>Kami sangat menghargai kepercayaan dan kerjasama Anda.</p>
+                <p>Semoga kami dapat melayani Anda kembali di lain kesempatan.</p>
+                <br>
+                <small>Subang Outdoor Team</small>
+            ";
+
+            $mail_thanks->send();
+        } catch (Exception $e) {
+            error_log("Gagal mengirim email ucapan terima kasih: {$mail_thanks->ErrorInfo}");
+        }
+    }
+}
 
     // Redirect kembali ke halaman transaksi dengan pesan sukses
     header('Location: transaksi.php?status=success');

@@ -86,6 +86,7 @@ $denda =$data['total_harga_sewa']  * $terlambat ;
   <link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css" />
   <link rel="stylesheet" href="css/bootstrap.css">
   <link rel="stylesheet" href="css/main.css">
+   <link rel="shortcut icon" href="../../assets/img/logo.jpg">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 <body>

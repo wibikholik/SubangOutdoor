@@ -66,91 +66,76 @@ while ($row = mysqli_fetch_assoc($result)) {
                         <div class="table-responsive">
                             <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                                 <thead class="thead-light">
-                                    <tr>
-                                        <th>ID Pembayaran</th>
-                                        <th>ID Transaksi</th>
-                                        <th>Nama Penyewa</th>
-                                        <th>Tanggal Sewa</th>
-                                        <th>Total Pembayaran</th>
-                                        <th>Bukti</th>
-                                        <th>Status</th>
-                                        <!-- <th>Aksi</th> -->
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php foreach ($pembayaranList as $row): ?>
-                                        <tr>
-                                            <td><?= htmlspecialchars($row['id_pembayaran']) ?></td>
-                                            <td><?= htmlspecialchars($row['id_transaksi']) ?></td>
-                                            <td><?= htmlspecialchars($row['nama_penyewa']) ?></td>
-                                            <td><?= htmlspecialchars($row['tanggal_sewa']) ?></td>
-                                            <td>Rp <?= number_format($row['total_harga_sewa'], 0, ',', '.') ?></td>
-                                            <td>
-                                                <?php if ($row['bukti_pembayaran']): ?>
-                                                    <button 
-                                                        type="button" 
-                                                        class="btn btn-sm btn-info btn-bukti" 
-                                                        data-toggle="modal" 
-                                                        data-target="#modalBukti"
-                                                        data-img="../uploads/bukti/<?= htmlspecialchars($row['bukti_pembayaran']) ?>"
-                                                    >
-                                                        Lihat
-                                                    </button>
-                                                <?php else: ?>
-                                                    <span class="text-muted">-</span>
-                                                <?php endif; ?>
-                                            </td>
-                                            <td>
-                                                <?php
-                                                    $status = strtolower($row['status_pembayaran']);
-                                                    $badge_class = 'secondary'; // default
-                                                    switch ($status) {
-                                                        case 'menunggu konfirmasi pembayaran':
-                                                            $badge_class = 'warning';
-                                                            break;
-                                                        case 'dikonfirmasi pembayaran silahkan ambilbarang':
-                                                            $badge_class = 'info';
-                                                            break;
-                                                        case 'ditolak pembayaran':
-                                                            $badge_class = 'danger';
-                                                            break;
-                                                        case 'selesai':
-                                                            $badge_class = 'success';
-                                                            break;
-                                                        case 'batal':
-                                                            $badge_class = 'danger';
-                                                            break;
-                                                    }
-                                                ?>
-                                                <span class="badge badge-<?= $badge_class ?>">
-                                                    <?= htmlspecialchars($row['status_pembayaran']) ?>
-                                                </span>
-                                            </td>
-                                            <!-- <td>
-                                               <form method="POST" action="update_status.php" class="mb-0">
-                                                   <input type="hidden" name="id_pembayaran" value="<?= htmlspecialchars($row['id_pembayaran']); ?>">
-                                                   <select name="status_baru" onchange="this.form.submit()" class="form-control form-control-sm">
-                                                       <?php
-                                                       $status_options = [
-                                                           'menunggu konfirmasi pembayaran' => 'Menunggu Konfirmasi Pembayaran',
-                                                           'dikonfirmasi Pembayaran Silahkan AmbilBarang' => 'Dikonfirmasi Pembayaran Silahkan Ambil Barang',
-                                                           'Ditolak Pembayaran' => 'Ditolak Pembayaran',
-                                                           'selesai Pembayaran' => 'Selesai Pembayaran',
-                                                           'batal' => 'Batal',
-                                                           
-   
-                                                       ];
-                                                       foreach ($status_options as $value => $label) {
-                                                           $selected = ($status === $value) ? 'selected' : '';
-                                                           echo "<option value=\"$value\" $selected>$label</option>";
-                                                       }
-                                                       ?>
-                                                   </select>
-                                               </form>
-                                            </td> -->
-                                        </tr>
-                                    <?php endforeach; ?>
-                                </tbody>
+    <tr>
+        <th>ID Pembayaran</th>
+        <th>ID Transaksi</th>
+        <th>Nama Penyewa</th>
+        <th>Tanggal Sewa</th>
+        <th>Total Pembayaran</th>
+        <th>Bukti</th>
+        <th>Status</th>
+        <th>Aksi</th> <!-- tambahan -->
+    </tr>
+</thead>
+<tbody>
+    <?php foreach ($pembayaranList as $row): ?>
+        <tr>
+            <td><?= htmlspecialchars($row['id_pembayaran']) ?></td>
+            <td><?= htmlspecialchars($row['id_transaksi']) ?></td>
+            <td><?= htmlspecialchars($row['nama_penyewa']) ?></td>
+            <td><?= htmlspecialchars($row['tanggal_sewa']) ?></td>
+            <td>Rp <?= number_format($row['total_harga_sewa'], 0, ',', '.') ?></td>
+            <td>
+                <?php if ($row['bukti_pembayaran']): ?>
+                    <button 
+                        type="button" 
+                        class="btn btn-sm btn-info btn-bukti" 
+                        data-toggle="modal" 
+                        data-target="#modalBukti"
+                        data-img="../uploads/bukti/<?= htmlspecialchars($row['bukti_pembayaran']) ?>"
+                    >
+                        Lihat
+                    </button>
+                <?php else: ?>
+                    <span class="text-muted">-</span>
+                <?php endif; ?>
+            </td>
+            <td>
+                <?php
+                    $status = strtolower($row['status_pembayaran']);
+                    $badge_class = 'secondary';
+                    switch ($status) {
+                        case 'menunggu konfirmasi pembayaran':
+                            $badge_class = 'warning';
+                            break;
+                        case 'dikonfirmasi pembayaran silahkan ambilbarang':
+                            $badge_class = 'info';
+                            break;
+                        case 'ditolak pembayaran':
+                            $badge_class = 'danger';
+                            break;
+                        case 'selesai':
+                            $badge_class = 'success';
+                            break;
+                        case 'batal':
+                            $badge_class = 'danger';
+                            break;
+                    }
+                ?>
+                <span class="badge badge-<?= $badge_class ?>">
+                    <?= htmlspecialchars($row['status_pembayaran']) ?>
+                </span>
+            </td>
+            <td>
+                <form method="POST" action="hapus_pembayaran.php" onsubmit="return confirm('Yakin ingin menghapus pembayaran ini?');">
+                    <input type="hidden" name="id_pembayaran" value="<?= htmlspecialchars($row['id_pembayaran']) ?>">
+                    <button type="submit" class="btn btn-sm btn-danger">Hapus</button>
+                </form>
+            </td>
+        </tr>
+    <?php endforeach; ?>
+</tbody>
+
                             </table>
                         </div>
                     </div>

@@ -27,6 +27,7 @@ if (!$result) {
   <link rel="stylesheet" href="penyewa/page/css/nouislider.min.css">
   <link rel="stylesheet" href="penyewa/page/css/bootstrap.css">
   <link rel="stylesheet" href="penyewa/page/css/main.css">
+   <link rel="shortcut icon" href="assets/img/logo.jpg">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 
@@ -117,7 +118,7 @@ if (!$result) {
         <div class="single-features">
           <img src="penyewa/page/img/features/f-icon4.png" alt="" class="mb-2" width="40">
           <h6>Pembayaran Simpel</h6>
-          <p>Bisa transfer bank atau sistem online.</p>
+          <p>Bisa transfer bank atau Bayar langsung.</p>
         </div>
       </div>
     </div>
@@ -127,36 +128,22 @@ if (!$result) {
   <div class="container">
     <div class="row align-items-center">
       <div class="col-lg-6">
-        <img src="penyewa/layout/nature.jpg" class="img-fluid rounded shadow" alt="Tentang Kami">
+        <img src="layout/gunung.jpg" class="img-fluid rounded shadow" alt="Tentang Kami">
       </div>
       <div class="col-lg-6">
         <h2 class="mb-4">Tentang Kami</h2>
-        <p>Subang Outdoor adalah layanan penyewaan alat camping terlengkap di Subang. Kami menyediakan tenda, matras, kompor lapangan, dan perlengkapan lainnya dengan harga terjangkau dan proses yang mudah.</p>
+        <p>Subang Outdoor adalah layanan penyewaan alat camping terlengkap di Subang. Kami menyediakan tenda, matras, kompor , dan perlengkapan lainnya dengan harga terjangkau dan proses yang mudah.</p>
         <ul>
           <li>✔ Proses pemesanan cepat</li>
           <li>✔ Lokasi strategis</li>
           <li>✔ Alat selalu bersih dan siap pakai</li>
+          <li>✔ Pembayaran Simpel</li>
         </ul>
       </div>
     </div>
   </div>
 </section>
-<!-- Kontak -->
-<section class="contact-area section_gap" id="kontak">
-  <div class="container">
-    <div class="text-center mb-5">
-      <h2>Hubungi Kami</h2>
-    </div>
-    <div class="row justify-content-center">
-      <div class="col-md-6 text-center">
-        <p><i class="fa fa-map-marker"></i> Jln Babakan Curug, Cijambe
-Kota Subang, Jawa Barat</p>
-        <p><i class="fa fa-phone"></i> +62 812-3456-7890</p>
-        <p><i class="fa fa-envelope"></i> @subangoutdoor.com</p>
-      </div>
-    </div>
-  </div>
-</section>
+
 
 <!-- Footer -->
 <?php include('penyewa/layout/footer.php')?>
