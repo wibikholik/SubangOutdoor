@@ -12,10 +12,12 @@
 				<div class="col-lg-4  col-md-6 col-sm-6">
 					<div class="single-footer-widget">
 						<h6>Contact Us</h6>
-						<p>	Email : Subangoutdoor@gmail.com<br>
-							WhatsApp : 0823-1988-8249<br>
-							Instagram : sewaalatcampingsubang
-					</p>
+						<p>
+							Email : <a href="mailto:subangoutdoor@gmail.com">subangoutdoor@gmail.com</a><br>
+							WhatsApp : <a href="https://wa.me/6285351315532" target="_blank">0853-5131-5532</a><br>
+							Instagram : <a href="https://instagram.com/sewaalatcampingsubang" target="_blank">@sewaalatcampingsubang</a>
+						</p>
+
 						<div class="" id="mc_embed_signup">
 
 							<form target="_blank" novalidate="true" action="https://spondonit.us12.list-manage.com/subscribe/post?u=1462626880ade1ac87bd9c93a&amp;id=92a4423d01"
