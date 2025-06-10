@@ -10,44 +10,35 @@ include "../route/koneksi.php";
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Edit Data Barang</title>
 
     <!-- SB Admin 2 Template -->
-    <link href="../assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
-    <link href="https://fonts.googleapis.com/css?family=Nunito:200,400,700" rel="stylesheet">
-    <link href="../assets/css/sb-admin-2.min.css" rel="stylesheet">
+    <link href="../assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css" />
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,400,700" rel="stylesheet" />
+    <link href="../assets/css/sb-admin-2.min.css" rel="stylesheet" />
 </head>
 <body id="page-top">
 
-<!-- Page Wrapper -->
 <div id="wrapper">
 
-    <!-- Sidebar -->
     <?php include('../layout/sidebar.php'); ?>
-    <!-- End Sidebar -->
 
-    <!-- Content Wrapper -->
     <div id="content-wrapper" class="d-flex flex-column">
 
-        <!-- Main Content -->
         <div id="content">
 
-            <!-- Topbar -->
             <?php include('../layout/navbar.php'); ?>
-            <!-- End Topbar -->
 
-            <!-- Begin Page Content -->
             <div class="container-fluid">
 
-                <!-- Tombol Kembali -->
-              <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                        <h1 class="h3 mb-0 text-gray-800"><i ></i> Edit Barang</h1>
-                        <a href="barang.php" class="btn btn-sm btn-secondary shadow-sm">
-                            <i class="fas fa-arrow-left fa-sm text-white-50"></i> Kembali
-                        </a>
-                    </div>
+                <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                    <h1 class="h3 mb-0 text-gray-800">Edit Barang</h1>
+                    <a href="barang.php" class="btn btn-sm btn-secondary shadow-sm">
+                        <i class="fas fa-arrow-left fa-sm text-white-50"></i> Kembali
+                    </a>
+                </div>
 
                 <?php
                 if (isset($_GET['id_barang'])) {
@@ -59,63 +50,69 @@ include "../route/koneksi.php";
 
                     if ($data = mysqli_fetch_assoc($result)) {
                 ?>
-                    <div class="card shadow mb-4">
-                        <div class="card-body">
-                            <form action="update.php" method="post" enctype="multipart/form-data">
-                                <input type="hidden" name="id_barang" value="<?= $data['id_barang'] ?>">
 
-                                <div class="form-group">
-                                    <label>Nama Barang</label>
-                                    <input type="text" name="nama_barang" class="form-control" value="<?= htmlspecialchars($data['nama_barang']) ?>" required>
-                                </div>
+                <div class="card shadow mb-4">
+                    <div class="card-body">
+                        <form action="update.php" method="post" enctype="multipart/form-data">
+                            <input type="hidden" name="id_barang" value="<?= htmlspecialchars($data['id_barang']) ?>">
 
-                                <div class="form-group">
-                                    <label>Kategori</label>
-                                    <select name="kategori" class="form-control" required>
-                                        <option value="" disabled <?= $data['kategori'] == '' ? 'selected' : '' ?>>Pilih Kategori</option>
-                                        <option value="tenda" <?= $data['kategori'] == 'tenda' ? 'selected' : '' ?>>Tenda</option>
-                                        <option value="perlengkapan masak" <?= $data['kategori'] == 'perlengkapan masak' ? 'selected' : '' ?>>Perlengkapan Masak</option>
-                                        <option value="perlengkapan camping" <?= $data['kategori'] == 'perlengkapan camping' ? 'selected' : '' ?>>Perlengkapan Camping</option>
-                                    </select>
-                                </div>
+                            <div class="form-group">
+                                <label>Nama Barang</label>
+                                <input type="text" name="nama_barang" class="form-control" value="<?= htmlspecialchars($data['nama_barang']) ?>" required>
+                            </div>
 
-                                <div class="form-group form-check">
-                                    <input type="checkbox" name="unggulan" value="1" class="form-check-input" id="unggulanCheck" <?= $data['unggulan'] == 1 ? 'checked' : '' ?>>
-                                    <label class="form-check-label" for="unggulanCheck">Tandai sebagai Produk Unggulan</label>
-                                </div>
+                            <div class="form-group">
+                                <label>Kategori</label>
+                                <select name="id_kategori" class="form-control" required>
+                                    <option value="" disabled>-- Pilih Kategori --</option>
+                                    <?php
+                                    $kategori_query = mysqli_query($koneksi, "SELECT * FROM kategori ORDER BY nama_kategori ASC");
+                                    while ($row_kategori = mysqli_fetch_assoc($kategori_query)) {
+                                        $selected = ($row_kategori['id_kategori'] == $data['id_kategori']) ? 'selected' : '';
+                                        echo '<option value="'.htmlspecialchars($row_kategori['id_kategori']).'" '.$selected.'>'.htmlspecialchars($row_kategori['nama_kategori']).'</option>';
+                                    }
+                                    ?>
+                                </select>
+                            </div>
 
-                                <div class="form-group">
-                                    <label>Keterangan</label>
-                                    <textarea name="keterangan" class="form-control" required><?= htmlspecialchars($data['keterangan']) ?></textarea>
-                                </div>
+                            <div class="form-group form-check">
+                                <input type="checkbox" name="unggulan" value="1" class="form-check-input" id="unggulanCheck" <?= ($data['unggulan'] == 1) ? 'checked' : '' ?>>
+                                <label class="form-check-label" for="unggulanCheck">Tandai sebagai Produk Unggulan</label>
+                            </div>
 
-                                <div class="form-group">
-                                    <label>Gambar</label>
-                                    <input type="file" name="gambar" class="form-control-file" accept="image/*">
-                                    <?php if (!empty($data['gambar'])): ?>
-                                        <div class="mt-2">
-                                            <img src="image/barang/<?= htmlspecialchars($data['gambar']) ?>" alt="Gambar Barang" class="img-thumbnail" style="width: 150px;">
-                                            <small class="form-text text-muted">Kosongkan jika tidak ingin mengubah gambar.</small>
-                                        </div>
-                                    <?php endif; ?>
-                                </div>
+                            <div class="form-group">
+                                <label>Keterangan</label>
+                                <textarea name="keterangan" class="form-control" required><?= htmlspecialchars($data['keterangan']) ?></textarea>
+                            </div>
 
-                                <div class="form-group">
-                                    <label>Stok Barang</label>
-                                    <input type="number" name="stok" class="form-control" min="0" value="<?= htmlspecialchars($data['stok']) ?>" required>
-                                </div>
+                            <div class="form-group">
+                                <label>Gambar</label>
+                                <input type="file" name="gambar" class="form-control-file" accept="image/*" />
+                                <?php if (!empty($data['gambar'])): ?>
+                                    <div class="mt-2">
+                                        <img src="image/barang/<?= htmlspecialchars($data['gambar']) ?>" alt="Gambar Barang" class="img-thumbnail" style="width: 150px;">
+                                        <small class="form-text text-muted">Kosongkan jika tidak ingin mengubah gambar.</small>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
 
-                                <div class="form-group">
-                                    <label>Harga Sewa (per hari)</label>
-                                    <input type="number" name="harga_sewa" class="form-control" step="0.01" min="0" value="<?= htmlspecialchars($data['harga_sewa']) ?>" required>
-                                </div>
+                            <div class="form-group">
+                                <label>Stok Barang</label>
+                                <input type="number" name="stok" class="form-control" min="0" value="<?= htmlspecialchars($data['stok']) ?>" required>
+                            </div>
 
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-save"></i> Simpan Perubahan
-                                </button>
-                            </form>
-                        </div>
+                            <div class="form-group">
+                                <label>Harga Sewa (per hari)</label>
+                                <input type="number" name="harga_sewa" class="form-control" step="0.01" min="0" value="<?= htmlspecialchars($data['harga_sewa']) ?>" required>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Simpan Perubahan
+                            </button>
+                        </form>
                     </div>
+                </div>
+
                 <?php
                     } else {
                         echo '<div class="alert alert-danger">Data tidak ditemukan.</div>';
@@ -125,19 +122,15 @@ include "../route/koneksi.php";
                     echo '<div class="alert alert-warning">ID Barang tidak tersedia.</div>';
                 }
                 ?>
+
             </div>
-            <!-- /.container-fluid -->
 
         </div>
-        <!-- End of Main Content -->
 
     </div>
-    <!-- End of Content Wrapper -->
 
 </div>
-<!-- End of Page Wrapper -->
 
-<!-- Scripts -->
 <script src="../assets/vendor/jquery/jquery.min.js"></script>
 <script src="../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script src="../assets/js/sb-admin-2.min.js"></script>

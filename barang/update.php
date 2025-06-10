@@ -1,78 +1,92 @@
 <?php
+session_start();
+if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], ['owner', 'admin'])) {
+    header('Location: ../login.php');
+    exit;
+}
+
 include '../route/koneksi.php';
 
-// Path upload gambar: di dalam folder barang ada folder gambar
 $folder_upload = "barang/gambar/";
 
 if (!is_dir($folder_upload)) {
-    mkdir($folder_upload, 0755, true);  // buat folder jika belum ada
+    mkdir($folder_upload, 0755, true);
 }
 
-$id_barang     = $_POST['id_barang'];
-$Nama_Barang   = $_POST['nama_barang'];   // disesuaikan dengan form edit
-$Keterangan    = $_POST['keterangan'];
-$Stok          = $_POST['stok'];
-$Harga_Barang  = $_POST['harga_sewa'];    // disesuaikan dengan form edit
-$Kategori      = $_POST['kategori'];
-$Unggulan      = isset($_POST['unggulan']) ? 1 : 0;
+// Ambil dan validasi input POST
+$id_barang   = $_POST['id_barang'] ?? '';
+$nama_barang = trim($_POST['nama_barang'] ?? '');
+$keterangan  = trim($_POST['keterangan'] ?? '');
+$stok        = intval($_POST['stok'] ?? 0);
+$harga_sewa  = floatval($_POST['harga_sewa'] ?? 0);
+$id_kategori = $_POST['id_kategori'] ?? '';
+$unggulan    = isset($_POST['unggulan']) ? 1 : 0;
 
-// Ambil gambar lama dari database
-$query = mysqli_query($koneksi, "SELECT gambar FROM barang WHERE id_barang='$id_barang'");
-$data_lama = mysqli_fetch_assoc($query);
-$gambar_lama = $data_lama['gambar'];
+// Validasi sederhana
+if ($id_barang == '' || $nama_barang == '' || $keterangan == '' || $stok < 0 || $harga_sewa < 0 || $id_kategori == '') {
+    echo "Input data tidak valid.";
+    exit;
+}
+
+// Cek apakah kategori valid (ada di database)
+$stmtCekKategori = mysqli_prepare($koneksi, "SELECT 1 FROM kategori WHERE id_kategori = ?");
+mysqli_stmt_bind_param($stmtCekKategori, "i", $id_kategori);
+mysqli_stmt_execute($stmtCekKategori);
+mysqli_stmt_store_result($stmtCekKategori);
+
+if (mysqli_stmt_num_rows($stmtCekKategori) === 0) {
+    echo "Kategori tidak valid.";
+    exit;
+}
+mysqli_stmt_close($stmtCekKategori);
+
+// Ambil gambar lama
+$stmtGambarLama = mysqli_prepare($koneksi, "SELECT gambar FROM barang WHERE id_barang = ?");
+mysqli_stmt_bind_param($stmtGambarLama, "i", $id_barang);
+mysqli_stmt_execute($stmtGambarLama);
+$resultGambar = mysqli_stmt_get_result($stmtGambarLama);
+$dataLama = mysqli_fetch_assoc($resultGambar);
+$gambar_lama = $dataLama['gambar'] ?? '';
+mysqli_stmt_close($stmtGambarLama);
 
 if (isset($_FILES['gambar']) && $_FILES['gambar']['error'] === 0) {
-    $file_tmp = $_FILES['gambar']['tmp_name'];
+    $file_tmp  = $_FILES['gambar']['tmp_name'];
     $file_name = basename($_FILES['gambar']['name']);
-    $file_ext = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
-    $allowed_ext = array('jpg', 'jpeg', 'png', 'gif');
+    $file_ext  = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
+    $allowed_ext = ['jpg', 'jpeg', 'png', 'gif'];
 
-    if (in_array($file_ext, $allowed_ext)) {
-        // nama file baru dengan timestamp + nama asli yang sudah difilter
-        $new_file_name = time() . "_" . preg_replace("/[^a-zA-Z0-9._-]/", "", $file_name);
-        $target_file = $folder_upload . $new_file_name;  // gabungkan path dan nama file
-
-        if (move_uploaded_file($file_tmp, $target_file)) {
-            // Hapus gambar lama jika ada
-            if (!empty($gambar_lama) && file_exists($folder_upload . $gambar_lama)) {
-                unlink($folder_upload . $gambar_lama);
-            }
-
-            // Update data dengan gambar baru
-            $update_query = "UPDATE barang SET 
-                nama_barang='$Nama_Barang',
-                keterangan='$Keterangan',
-                gambar='$new_file_name',
-                stok='$Stok',
-                harga_sewa='$Harga_Barang',
-                kategori='$Kategori',
-                unggulan='$Unggulan'
-                WHERE id_barang='$id_barang'";
-
-            mysqli_query($koneksi, $update_query) or die(mysqli_error($koneksi));
-            header("location:barang.php?pesan=update");
-            exit;
-        } else {
-            echo "Gagal mengupload gambar baru.";
-            exit;
-        }
-    } else {
+    if (!in_array($file_ext, $allowed_ext)) {
         echo "Format gambar tidak didukung. Gunakan JPG, JPEG, PNG, atau GIF.";
         exit;
     }
-} else {
-    // Update data tanpa mengganti gambar
-    $update_query = "UPDATE barang SET 
-        nama_barang='$Nama_Barang',
-        keterangan='$Keterangan',
-        stok='$Stok',
-        harga_sewa='$Harga_Barang',
-        kategori='$Kategori',
-        unggulan='$Unggulan'
-        WHERE id_barang='$id_barang'";
 
-    mysqli_query($koneksi, $update_query) or die(mysqli_error($koneksi));
-    header("location:barang.php?pesan=update");
+    $new_file_name = time() . "_" . preg_replace("/[^a-zA-Z0-9._-]/", "", $file_name);
+    $target_file = $folder_upload . $new_file_name;
+
+    if (!move_uploaded_file($file_tmp, $target_file)) {
+        echo "Gagal mengupload gambar baru.";
+        exit;
+    }
+
+    // Hapus gambar lama jika ada
+    if (!empty($gambar_lama) && file_exists($folder_upload . $gambar_lama)) {
+        unlink($folder_upload . $gambar_lama);
+    }
+
+    // Update dengan gambar baru
+    $stmtUpdate = mysqli_prepare($koneksi, "UPDATE barang SET nama_barang=?, keterangan=?, gambar=?, stok=?, harga_sewa=?, id_kategori=?, unggulan=? WHERE id_barang=?");
+    mysqli_stmt_bind_param($stmtUpdate, "sssdisii", $nama_barang, $keterangan, $new_file_name, $stok, $harga_sewa, $id_kategori, $unggulan, $id_barang);
+} else {
+    // Update tanpa gambar baru
+    $stmtUpdate = mysqli_prepare($koneksi, "UPDATE barang SET nama_barang=?, keterangan=?, stok=?, harga_sewa=?, id_kategori=?, unggulan=? WHERE id_barang=?");
+    mysqli_stmt_bind_param($stmtUpdate, "ssdisii", $nama_barang, $keterangan, $stok, $harga_sewa, $id_kategori, $unggulan, $id_barang);
+}
+
+if (mysqli_stmt_execute($stmtUpdate)) {
+    mysqli_stmt_close($stmtUpdate);
+    header("Location: barang.php?pesan=update");
     exit;
+} else {
+    echo "Gagal update data: " . mysqli_error($koneksi);
 }
 ?>

@@ -118,6 +118,9 @@ if (isset($_GET['message'])) {
         <div class="register-link">
             Belum punya akun? <a href="register.php">Daftar di sini</a>
         </div>
+        <div class="register-link">
+            Lupa  Password? <a href="register.php">reset di sini</a>
+        </div>
     </div>
 </body>
 </html>

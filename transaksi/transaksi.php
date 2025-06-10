@@ -103,7 +103,7 @@ function getBadgeClass($status) {
 
                 <div class="card shadow mb-4">
                     <div class="card-header py-3">
-                        <a class="btn btn-primary" href="tambah_transaksi.php" role="button">Tambah Transaksi</a>
+                        
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">

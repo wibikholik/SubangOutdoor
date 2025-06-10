@@ -4,6 +4,7 @@ if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], ['owner', 'admin']
     header('Location: ../login.php');
     exit;
 }
+include '../route/koneksi.php'; // koneksi DB
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -17,6 +18,28 @@ if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], ['owner', 'admin']
     <link href="../assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Nunito:200,400,700" rel="stylesheet">
     <link href="../assets/css/sb-admin-2.min.css" rel="stylesheet">
+
+    <script>
+    // Preview gambar sebelum upload
+    function previewImage() {
+        const gambar = document.querySelector('#gambar');
+        const preview = document.querySelector('#img-preview');
+        const file = gambar.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+                preview.style.maxWidth = '200px';
+                preview.style.marginTop = '10px';
+            }
+            reader.readAsDataURL(file);
+        } else {
+            preview.src = '';
+            preview.style.display = 'none';
+        }
+    }
+    </script>
 </head>
 
 <body id="page-top">
@@ -39,11 +62,11 @@ if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], ['owner', 'admin']
 
                 <!-- Page Heading -->
                 <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                        <h1 class="h3 mb-0 text-gray-800"><i ></i> Tambah Barang</h1>
-                        <a href="barang.php" class="btn btn-sm btn-secondary shadow-sm">
-                            <i class="fas fa-arrow-left fa-sm text-white-50"></i> Kembali
-                        </a>
-                    </div>
+                    <h1 class="h3 mb-0 text-gray-800">Tambah Barang</h1>
+                    <a href="barang.php" class="btn btn-sm btn-secondary shadow-sm">
+                        <i class="fas fa-arrow-left fa-sm text-white-50"></i> Kembali
+                    </a>
+                </div>
 
                 <!-- Form Input -->
                 <div class="card shadow mb-4">
@@ -55,16 +78,21 @@ if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], ['owner', 'admin']
                             </div>
 
                             <div class="form-group">
-                                <label for="kategori">Kategori</label>
-                                <select class="form-control" id="kategori" name="kategori" required>
+                                <label for="id_kategori">Kategori</label>
+                                <select class="form-control" id="id_kategori" name="id_kategori" required>
                                     <option value="" disabled selected>Pilih Kategori</option>
-                                    <option value="tenda">Tenda</option>
-                                    <option value="perlengkapan masak">Perlengkapan Masak</option>
-                                    <option value="perlengkapan camping">Perlengkapan Camping</option>
+                                    <?php
+                                    $query = mysqli_query($koneksi, "SELECT id_kategori, nama_kategori FROM kategori ORDER BY nama_kategori ASC");
+                                    while ($row = mysqli_fetch_assoc($query)) {
+                                        echo '<option value="'.htmlspecialchars($row['id_kategori']).'">'.htmlspecialchars($row['nama_kategori']).'</option>';
+                                    }
+                                    ?>
                                 </select>
                             </div>
 
                             <div class="form-group form-check">
+                                <!-- Hidden input untuk memastikan nilai terkirim walau checkbox tidak dicek -->
+                                <input type="hidden" name="unggulan" value="0">
                                 <input type="checkbox" class="form-check-input" id="unggulan" name="unggulan" value="1">
                                 <label class="form-check-label" for="unggulan">Produk Unggulan</label>
                             </div>
@@ -76,7 +104,8 @@ if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], ['owner', 'admin']
 
                             <div class="form-group">
                                 <label for="gambar">Gambar</label>
-                                <input type="file" class="form-control-file" id="gambar" name="gambar" accept="image/*" required>
+                                <input type="file" class="form-control-file" id="gambar" name="gambar" accept="image/*" required onchange="previewImage()">
+                                <img id="img-preview" src="#" alt="Preview Gambar" style="display:none;">
                             </div>
 
                             <div class="form-group">

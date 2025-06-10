@@ -34,6 +34,12 @@ $username = $_SESSION['username'] ?? 'Guest';
                 </a>
             </li>
             <li class="nav-item">
+                <a class="nav-link" href="../kategori/kategori.php">
+                    <i class="fas fa-fw fa-boxes"></i>
+                    <span>Kategori Barang</span>
+                </a>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link" href="../dataPenyewa/penyewa.php">
                     <i class="fas fa-fw fa-users"></i>
                     <span>Penyewa</span>
@@ -80,6 +86,12 @@ $username = $_SESSION['username'] ?? 'Guest';
                 <a class="nav-link" href="../barang/barang.php">
                     <i class="fas fa-fw fa-boxes"></i>
                     <span>Barang</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="../kategori/kategori.php">
+                    <i class="fas fa-fw fa-boxes"></i>
+                    <span>Kategori Barang</span>
                 </a>
             </li>
             <li class="nav-item">
