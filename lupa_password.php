@@ -22,9 +22,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $found = false;
 
         foreach ($user_tables as $table => $field) {
-            $cek = mysqli_query($koneksi, "SELECT * FROM $table WHERE $field = '$username'");
-            if (mysqli_num_rows($cek) > 0) {
-                $update = mysqli_query($koneksi, "UPDATE $table SET password = '$password' WHERE $field = '$username'");
+            // Sebaiknya gunakan prepared statements untuk keamanan
+            $stmt_cek = mysqli_prepare($koneksi, "SELECT * FROM $table WHERE $field = ?");
+            mysqli_stmt_bind_param($stmt_cek, "s", $username);
+            mysqli_stmt_execute($stmt_cek);
+            $result_cek = mysqli_stmt_get_result($stmt_cek);
+
+            if (mysqli_num_rows($result_cek) > 0) {
+                // Hash password sebelum disimpan
+                $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+                
+                $stmt_update = mysqli_prepare($koneksi, "UPDATE $table SET password = ? WHERE $field = ?");
+                mysqli_stmt_bind_param($stmt_update, "ss", $hashed_password, $username);
+                $update = mysqli_stmt_execute($stmt_update);
+                
                 if ($update) {
                     echo "<script>
                         alert('Password berhasil diubah. Anda akan diarahkan ke halaman login.');
@@ -54,12 +65,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Reset Password</title>
     <style>
         body {
-            font-family: sans-serif;
-            background-color: #eef2f3;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-image: url('assets/img/bekgrun.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            
+            
             display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
+            justify-content: center; 
+            align-items: center;    
+            height: 100vh;          
+            margin: 0;              
         }
         .container {
             background: #fff;
@@ -87,7 +105,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .toggle-password {
             position: absolute;
             right: 12px;
-            top: 50%;
+            top: 21px; /* Disesuaikan agar pas di tengah input */
             transform: translateY(-50%);
             cursor: pointer;
             font-size: 18px;
@@ -129,19 +147,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="container">
         <h2>Reset Password</h2>
         <?php if ($message): ?>
-            <div class="message"><?= $message ?></div>
+            <div class="message"><?= htmlspecialchars($message) ?></div>
         <?php endif; ?>
-        <form method="POST">
+        <form method="POST" action="">
             <input type="text" name="username" placeholder="Masukkan Nama Admin / Owner / Penyewa" required>
 
             <div class="password-container">
                 <input type="password" name="password" id="password" placeholder="Password Baru" required>
-                <span class="toggle-password" toggle="#password">👁️</span>
+                <span class="toggle-password" data-toggle="#password">👁️</span>
             </div>
 
             <div class="password-container">
                 <input type="password" name="confirm" id="confirm" placeholder="Konfirmasi Password" required>
-                <span class="toggle-password" toggle="#confirm">👁️</span>
+                <span class="toggle-password" data-toggle="#confirm">👁️</span>
             </div>
 
             <button type="submit">Ubah Password</button>
@@ -154,7 +172,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <script>
         document.querySelectorAll('.toggle-password').forEach(icon => {
             icon.addEventListener('click', function () {
-                const targetInput = document.querySelector(this.getAttribute('toggle'));
+                const targetInput = document.querySelector(this.getAttribute('data-toggle'));
                 const type = targetInput.getAttribute('type') === 'password' ? 'text' : 'password';
                 targetInput.setAttribute('type', type);
                 this.textContent = type === 'password' ? '👁️' : '🙈';

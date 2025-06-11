@@ -1,7 +1,7 @@
 <?php
 $host = "localhost";
 $username = "root";
-$password = "";
+$password = "tokoloak";
 $databases = "subangoutdoor3";
 
 
