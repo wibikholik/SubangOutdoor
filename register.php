@@ -6,7 +6,12 @@
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f0f2f5;
+            background-image: url('assets/img/bekgrun.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+
             display: flex;
             justify-content: center;
             align-items: center;
@@ -95,7 +100,7 @@
             <input type="email" name="email" required>
 
             <label>Password</label>
-            <input type="password" name="password" required>
+            <input type="password" name="password" required minlength="8" title="Password minimal harus terdiri dari 8 karakter">
 
             <button type="submit" name="register">Daftar</button>
         </form>

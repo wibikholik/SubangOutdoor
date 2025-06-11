@@ -26,9 +26,9 @@ $grafik_penyewaan = mysqli_query($koneksi, "
 
 // Grafik pengembalian (tanggal_kembali dengan status selesai)
 $grafik_pengembalian = mysqli_query($koneksi, "
-    SELECT DATE_FORMAT(tanggal_kembali, '%Y-%m') AS bulan, COUNT(*) AS total_pengembalian
-    FROM transaksi
-    WHERE status = 'Selesai Dikembalikan' AND tanggal_kembali IS NOT NULL
+    SELECT DATE_FORMAT(tanggal_pengembalian, '%Y-%m') AS bulan, COUNT(*) AS total_pengembalian
+    FROM pengembalian
+    WHERE status_pengembalian = 'Selesai Dikembalikan' AND tanggal_pengembalian IS NOT NULL
     GROUP BY bulan
     ORDER BY bulan ASC
 ");
@@ -116,7 +116,7 @@ $total_barang_disewa = mysqli_fetch_assoc(mysqli_query($koneksi, "
 
                 <!-- Stok Menipis -->
                 <div class="card shadow mb-4">
-                    <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-primary">Barang dengan Stok Menipis (≤ 5)</h6></div>
+                    <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-primary">Barang dengan Stok Menipis</h6></div>
                     <div class="card-body">
                         <table class="table table-bordered">
                             <thead>
@@ -166,59 +166,88 @@ $total_barang_disewa = mysqli_fetch_assoc(mysqli_query($koneksi, "
 
                 <!-- Grafik Penyewaan dan Pengembalian -->
                 <div class="card shadow mb-4">
-                    <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-info">Grafik Penyewaan & Pengembalian per Bulan</h6></div>
-                    <div class="card-body">
-                       <canvas id="grafikPenyewaan" height="100"></canvas>
-                    </div>
-                </div>
-
-            </div>
-        </div>
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-info">Grafik Penyewaan & Pengembalian per Bulan</h6>
+    </div>
+    <div class="card-body">
+        <canvas id="grafikPenyewaan" height="100"></canvas>
     </div>
 </div>
 
-<!-- Scripts -->
 <script src="../assets/vendor/jquery/jquery.min.js"></script>
 <script src="../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script src="../assets/vendor/jquery-easing/jquery.easing.min.js"></script>
 <script src="../assets/js/sb-admin-2.min.js"></script>
-
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <script>
-const ctx = document.getElementById('grafikPenyewaan').getContext('2d');
-new Chart(ctx, {
-    type: 'line',
-    data: {
-        labels: <?= json_encode($labels_bulan) ?>,
-        datasets: [
-            {
+    // 1. Data dari PHP (tidak ada perubahan di sini)
+    const labelsBulan = <?= json_encode($labels_bulan ?? []) ?>;
+    const dataPenyewaan = <?= json_encode($data_penyewaan ?? []) ?>;
+    const dataPengembalian = <?= json_encode($data_pengembalian ?? []) ?>;
+
+    // 2. Ambil konteks dari elemen canvas
+    const ctx = document.getElementById('grafikPenyewaan').getContext('2d');
+
+    // 3. Buat Grafik Batang (Bar Chart) baru
+    new Chart(ctx, {
+        type: 'bar', // Mengubah tipe grafik menjadi 'bar'
+        data: {
+            labels: labelsBulan,
+            datasets: [{
                 label: 'Jumlah Penyewaan',
-                data: <?= json_encode($data_penyewaan) ?>,
+                data: dataPenyewaan,
+                backgroundColor: '#4e73df', // Warna batang untuk penyewaan
                 borderColor: '#4e73df',
-                backgroundColor: 'rgba(78, 115, 223, 0.1)',
-                fill: true,
-                tension: 0.3
-            },
-            {
+                borderWidth: 1,
+                maxBarThickness: 40 // Mengatur ketebalan maksimum batang (opsional)
+            }, {
                 label: 'Jumlah Pengembalian',
-                data: <?= json_encode($data_pengembalian) ?>,
+                data: dataPengembalian,
+                backgroundColor: '#1cc88a', // Warna batang untuk pengembalian
                 borderColor: '#1cc88a',
-                backgroundColor: 'rgba(28, 200, 138, 0.1)',
-                fill: true,
-                tension: 0.3
-            }
-        ]
-    },
-    options: {
-        responsive: true,
-        scales: {
-            y: {
-                beginAtZero: true,
-                precision: 0
+                borderWidth: 1,
+                maxBarThickness: 40 // Mengatur ketebalan maksimum batang (opsional)
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        // Memastikan sumbu Y hanya menampilkan bilangan bulat
+                        precision: 0
+                    }
+                },
+                x: {
+                    // Memberi sedikit ruang di awal dan akhir sumbu X
+                    offset: true
+                }
+            },
+            plugins: {
+                legend: {
+                    position: 'top', // Posisi legenda di atas
+                },
+                tooltip: {
+                    // Kustomisasi tooltip saat mouse hover
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            if (context.parsed.y !== null) {
+                                label += context.parsed.y + ' transaksi';
+                            }
+                            return label;
+                        }
+                    }
+                }
             }
         }
-    }
-});
+    });
 </script>
 
 </body>
