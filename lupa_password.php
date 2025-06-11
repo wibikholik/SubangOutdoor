@@ -1,83 +1,80 @@
 <?php
-// Koneksi ke database
+session_start();
 include 'route/koneksi.php';
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+require 'vendor/autoload.php';
 
 $message = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = $_POST['username'];
-    $password = $_POST['password'];
-    $confirm  = $_POST['confirm'];
+    $email = $_POST['email'];
 
-    if ($password !== $confirm) {
-        $message = "Password tidak cocok.";
-    } else {
-        // Mapping nama tabel dan field username-nya
-        $user_tables = [
-            'admin'  => 'nama_admin',
-            'owner'  => 'nama_owner',
-            'penyewa'=> 'nama_penyewa'
-        ];
+    // Cek email di semua tabel
+    $tables = ['admin' => 'email', 'owner' => 'email', 'penyewa' => 'email'];
+    $found = false;
 
-        $found = false;
+    foreach ($tables as $table => $field) {
+        $cek = mysqli_query($koneksi, "SELECT * FROM $table WHERE $field = '$email'");
+        if (mysqli_num_rows($cek) > 0) {
+            $otp = rand(100000, 999999);
+            $_SESSION['reset_email'] = $email;
+            $_SESSION['reset_otp'] = $otp;
+            $_SESSION['reset_time'] = time();
 
-        foreach ($user_tables as $table => $field) {
-            // Sebaiknya gunakan prepared statements untuk keamanan
-            $stmt_cek = mysqli_prepare($koneksi, "SELECT * FROM $table WHERE $field = ?");
-            mysqli_stmt_bind_param($stmt_cek, "s", $username);
-            mysqli_stmt_execute($stmt_cek);
-            $result_cek = mysqli_stmt_get_result($stmt_cek);
+            // Kirim email OTP
+            $mail = new PHPMailer(true);
+            try {
+            $mail = new PHPMailer(true);
+            // Konfigurasi SMTP
+            $mail->isSMTP();
+            $mail->Host       = 'smtp.gmail.com';
+            $mail->SMTPAuth   = true;
+            $mail->Username   = 'subangoutdoortes@gmail.com';  // Ganti dengan email pengirim Anda
+            $mail->Password   = 'sbsn ajtg fgox otra';          // Ganti dengan App Password email
+            $mail->SMTPSecure = 'tls';
+            $mail->Port       = 587;
 
-            if (mysqli_num_rows($result_cek) > 0) {
-                // Hash password sebelum disimpan
-                $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-                
-                $stmt_update = mysqli_prepare($koneksi, "UPDATE $table SET password = ? WHERE $field = ?");
-                mysqli_stmt_bind_param($stmt_update, "ss", $hashed_password, $username);
-                $update = mysqli_stmt_execute($stmt_update);
-                
-                if ($update) {
-                    echo "<script>
-                        alert('Password berhasil diubah. Anda akan diarahkan ke halaman login.');
-                        setTimeout(function() {
-                            window.location.href = 'login.php?message=reset_success';
-                        }, 1000);
-                    </script>";
-                    exit;
-                } else {
-                    $message = "Gagal mengubah password.";
-                }
-                $found = true;
-                break;
+            $mail->setFrom('subangoutdoortes@gmail.com', 'Subang Outdoor');
+                $mail->addAddress($email);
+                $mail->Subject = 'Kode OTP Reset Password';
+                $mail->Body = "Kode OTP Anda adalah: $otp";
+
+                $mail->send();
+                header("Location: verifikasi_otp.php");
+                exit;
+            } catch (Exception $e) {
+                $message = 'Gagal mengirim OTP. ' . $mail->ErrorInfo;
             }
-        }
 
-        if (!$found) {
-            $message = "Username tidak ditemukan di tabel manapun.";
+            $found = true;
+            break;
         }
+    }
+
+    if (!$found) {
+        $message = "Email tidak ditemukan.";
     }
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Reset Password</title>
+    <title>Lupa Password</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-image: url('assets/img/bekgrun.jpg');
             background-size: cover;
-            background-position: center;
             background-repeat: no-repeat;
-            background-attachment: fixed;
-            
-            
+            background-position: center;
             display: flex;
-            justify-content: center; 
-            align-items: center;    
-            height: 100vh;          
-            margin: 0;              
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
         }
         .container {
             background: #fff;
@@ -92,24 +89,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         input {
             width: 100%;
-            padding: 10px 40px 10px 14px; /* ruang kanan untuk ikon */
+            padding: 10px 14px;
             margin-bottom: 15px;
             border-radius: 6px;
             border: 1px solid #ccc;
             font-size: 16px;
             box-sizing: border-box;
-        }
-        .password-container {
-            position: relative;
-        }
-        .toggle-password {
-            position: absolute;
-            right: 12px;
-            top: 21px; /* Disesuaikan agar pas di tengah input */
-            transform: translateY(-50%);
-            cursor: pointer;
-            font-size: 18px;
-            color: #888;
         }
         button {
             background-color: #007bff;
@@ -145,39 +130,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body>
     <div class="container">
-        <h2>Reset Password</h2>
+        <h2>Lupa Password</h2>
         <?php if ($message): ?>
-            <div class="message"><?= htmlspecialchars($message) ?></div>
+            <div class="message"><?= $message ?></div>
         <?php endif; ?>
-        <form method="POST" action="">
-            <input type="text" name="username" placeholder="Masukkan Nama Admin / Owner / Penyewa" required>
-
-            <div class="password-container">
-                <input type="password" name="password" id="password" placeholder="Password Baru" required>
-                <span class="toggle-password" data-toggle="#password">👁️</span>
-            </div>
-
-            <div class="password-container">
-                <input type="password" name="confirm" id="confirm" placeholder="Konfirmasi Password" required>
-                <span class="toggle-password" data-toggle="#confirm">👁️</span>
-            </div>
-
-            <button type="submit">Ubah Password</button>
+        <form method="POST">
+            <input type="email" name="email" placeholder="Masukkan Email Anda" required>
+            <button type="submit">Kirim OTP</button>
         </form>
         <div class="back-link">
             <a href="login.php">&larr; Kembali ke Login</a>
         </div>
     </div>
-
-    <script>
-        document.querySelectorAll('.toggle-password').forEach(icon => {
-            icon.addEventListener('click', function () {
-                const targetInput = document.querySelector(this.getAttribute('data-toggle'));
-                const type = targetInput.getAttribute('type') === 'password' ? 'text' : 'password';
-                targetInput.setAttribute('type', type);
-                this.textContent = type === 'password' ? '👁️' : '🙈';
-            });
-        });
-    </script>
 </body>
 </html>
