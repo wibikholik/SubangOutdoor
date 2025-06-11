@@ -25,16 +25,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $message_type = 'error';
     } else {
         $email = $_SESSION['reset_email'];
-
-        // --- PENINGKATAN KEAMANAN 1: HASHING PASSWORD (SANGAT PENTING!) ---
-        // Jangan pernah menyimpan password sebagai teks biasa. Gunakan password_hash().
         $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
 
         // Cari tahu pengguna ada di tabel mana (admin, owner, atau penyewa)
         $user_data = null;
         $tables = ['admin', 'owner', 'penyewa'];
         foreach ($tables as $table) {
-            // --- PENINGKATAN KEAMANAN 2: MENCEGAH SQL INJECTION ---
             $stmt_check = $koneksi->prepare("SELECT email FROM $table WHERE email = ?");
             $stmt_check->bind_param("s", $email);
             $stmt_check->execute();
@@ -47,17 +43,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         if ($user_data) {
-            // Jika pengguna ditemukan, update passwordnya
             $target_table = $user_data['table'];
             $stmt_update = $koneksi->prepare("UPDATE $target_table SET password = ? WHERE email = ?");
             $stmt_update->bind_param("ss", $hashedPassword, $email);
 
             if ($stmt_update->execute()) {
-                // Jika berhasil, hancurkan session dan arahkan ke login dengan pesan sukses
                 session_unset();
                 session_destroy();
-
-                session_start(); // Mulai session baru hanya untuk pesan sukses
+                session_start();
                 $_SESSION['success_message'] = "Password berhasil direset. Silakan login dengan password baru Anda.";
                 header("Location: login.php");
                 exit;
@@ -137,23 +130,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             color: #555;
             margin-bottom: 8px;
         }
+        
+        /* --- CSS BARU UNTUK POSISI IKON --- */
+        .password-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
 
-        input[type="password"] {
+        input[type="password"], input[type="text"] { /* Diterapkan ke text juga untuk saat password terlihat */
             width: 100%;
-            padding: 12px 14px;
+            padding: 12px 40px 12px 14px; /* Tambah padding kanan untuk ruang ikon */
             border: 1.5px solid #ccc;
             border-radius: 8px;
             font-size: 16px;
             box-sizing: border-box;
         }
         
-        input[type="password"]:focus {
+        input:focus { /* lebih spesifik */
             border-color: #007BFF;
             outline: none;
         }
+        
+        .toggle-password {
+            position: absolute;
+            right: 15px; /* Jarak ikon dari kanan */
+            cursor: pointer;
+            color: #888;
+            user-select: none; /* Agar ikon tidak bisa di-select */
+        }
+        /* --- AKHIR CSS BARU --- */
 
         button {
-            background-color: #28a745; /* Warna Hijau untuk Aksi Positif */
+            background-color: #28a745;
             color: white;
             padding: 12px;
             width: 100%;
@@ -181,25 +190,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <form method="POST" action="reset_password.php" novalidate>
             <div class="form-group">
                 <label for="password">Password Baru</label>
-                <input type="password" name="password" id="password" placeholder="Minimal 8 karakter" required minlength="8">
-                <span id="togglePassword" class="toggle-password">👁️</span>
+                <div class="password-wrapper">
+                    <input type="password" name="password" id="password" placeholder="Minimal 8 karakter" required minlength="8">
+                    <span class="toggle-password">👁️</span>
+                </div>
             </div>
             <div class="form-group">
                 <label for="confirm_password">Konfirmasi Password Baru</label>
-                <input type="password" name="confirm_password" id="confirm_password" placeholder="Ketik ulang password baru" required>
-                <span id="togglePassword" class="toggle-password">👁️</span>
+                <div class="password-wrapper">
+                    <input type="password" name="confirm_password" id="confirm_password" placeholder="Ketik ulang password baru" required>
+                    <span class="toggle-password">👁️</span>
+                </div>
             </div>
             <button type="submit">Reset Password</button>
         </form>
     </div>
-     <script>
-        const togglePassword = document.getElementById('togglePassword');
-        const passwordInput = document.getElementById('password');
-
-        togglePassword.addEventListener('click', function () {
-            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-            passwordInput.setAttribute('type', type);
-            this.textContent = type === 'password' ? '👁️' : '🙈';
+    
+    <script>
+        document.querySelectorAll('.toggle-password').forEach(item => {
+            item.addEventListener('click', function () {
+                // Cari input password yang berada sebelum ikon ini
+                const passwordInput = this.previousElementSibling;
+                
+                // Ubah tipe input
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                
+                // Ubah ikon mata
+                this.textContent = type === 'password' ? '👁️' : '🙈';
+            });
         });
     </script>
 </body>
