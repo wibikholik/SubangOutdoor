@@ -3,9 +3,8 @@ session_start();
 include 'route/koneksi.php';
 
 $message = '';
-$message_type = ''; // Untuk membedakan pesan error (merah) atau sukses (hijau)
+$message_type = '';
 
-// Jika pengguna belum verifikasi OTP, jangan izinkan masuk ke halaman ini.
 if (!isset($_SESSION['otp_verified']) || !$_SESSION['otp_verified']) {
     header("Location: verifikasi_otp.php");
     exit;
@@ -15,19 +14,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password = $_POST['password'];
     $confirm = $_POST['confirm_password'];
 
-    // Validasi 1: Password harus cocok
     if ($password !== $confirm) {
         $message = "Konfirmasi password tidak cocok. Silakan coba lagi.";
         $message_type = 'error';
-    // Validasi 2: Password minimal 8 karakter
     } elseif (strlen($password) < 8) {
         $message = "Password baru harus terdiri dari minimal 8 karakter.";
         $message_type = 'error';
     } else {
         $email = $_SESSION['reset_email'];
-        $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
 
-        // Cari tahu pengguna ada di tabel mana (admin, owner, atau penyewa)
+        $plainPassword = $password;
+
         $user_data = null;
         $tables = ['admin', 'owner', 'penyewa'];
         foreach ($tables as $table) {
@@ -44,8 +41,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($user_data) {
             $target_table = $user_data['table'];
+            
             $stmt_update = $koneksi->prepare("UPDATE $target_table SET password = ? WHERE email = ?");
-            $stmt_update->bind_param("ss", $hashedPassword, $email);
+            $stmt_update->bind_param("ss", $plainPassword, $email); 
+
 
             if ($stmt_update->execute()) {
                 session_unset();
@@ -72,10 +71,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <title>Reset Password - Subang Outdoor</title>
     <style>
-        /* CSS yang sama dari halaman sebelumnya untuk tampilan yang konsisten */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-image: url('assets/img/bekgrun.jpg'); /* Pastikan path ini benar */
+            background-image: url('assets/img/bekgrun.jpg');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -86,7 +84,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             height: 100vh;
             margin: 0;
         }
-
         .login-container {
             background: rgba(255, 255, 255, 0.95);
             padding: 30px 35px;
@@ -95,12 +92,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             width: 400px;
             text-align: center;
         }
-
         h2 {
             color: #333;
             margin-bottom: 25px;
         }
-
         .message {
             padding: 12px;
             border-radius: 8px;
@@ -113,54 +108,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             color: #721c24;
             border-color: #f5c6cb;
         }
-        .message.success {
-            background-color: #d4edda;
-            color: #155724;
-            border-color: #c3e6cb;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-            text-align: left;
-        }
-        
-        label {
-            display: block;
-            font-weight: 600;
-            color: #555;
-            margin-bottom: 8px;
-        }
-        
-        /* --- CSS BARU UNTUK POSISI IKON --- */
         .password-wrapper {
             position: relative;
             display: flex;
             align-items: center;
         }
-
-        input[type="password"], input[type="text"] { /* Diterapkan ke text juga untuk saat password terlihat */
+        input[type="password"], input[type="text"] {
             width: 100%;
-            padding: 12px 40px 12px 14px; /* Tambah padding kanan untuk ruang ikon */
+            padding: 12px 40px 12px 14px;
             border: 1.5px solid #ccc;
             border-radius: 8px;
             font-size: 16px;
             box-sizing: border-box;
         }
-        
-        input:focus { /* lebih spesifik */
-            border-color: #007BFF;
-            outline: none;
-        }
-        
         .toggle-password {
             position: absolute;
-            right: 15px; /* Jarak ikon dari kanan */
+            right: 15px;
             cursor: pointer;
             color: #888;
-            user-select: none; /* Agar ikon tidak bisa di-select */
+            user-select: none;
         }
-        /* --- AKHIR CSS BARU --- */
-
         button {
             background-color: #28a745;
             color: white;
@@ -173,9 +140,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             font-weight: bold;
             transition: background-color 0.3s ease;
         }
-
         button:hover {
             background-color: #218838;
+        }
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        label {
+            display: block;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 8px;
         }
     </style>
 </head>
@@ -209,14 +185,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <script>
         document.querySelectorAll('.toggle-password').forEach(item => {
             item.addEventListener('click', function () {
-                // Cari input password yang berada sebelum ikon ini
                 const passwordInput = this.previousElementSibling;
-                
-                // Ubah tipe input
                 const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
                 passwordInput.setAttribute('type', type);
-                
-                // Ubah ikon mata
                 this.textContent = type === 'password' ? '👁️' : '🙈';
             });
         });
