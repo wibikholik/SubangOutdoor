@@ -25,20 +25,7 @@ $stmt->bind_param("i", $id_penyewa);
 $stmt->execute();
 $result_transaksi = $stmt->get_result();
 
-$status_map = [
-    'Menunggu Konfirmasi Pembayaran' => ['bg-warning text-dark', 'Menunggu Konfirmasi Pembayaran'],
-    'Dikonfirmasi Pembayaran Silahkan AmbilBarang' => ['bg-success text-light', 'Dikonfirmasi (Silahkan Ambil Barang)'],
-    'menunggu konfirmasi pesanan'=>['bg-warning text-dark',],
-    'ditolak pembayaran' => ['bg-danger text-light', 'Ditolak Pembayaran'],
-    'elesai pembayaran' => ['bg-success text-dark', 'Selesai Pembayaran'],
-    'disewa' => ['bg-info text-dark', 'Disewa / Diambil Barang'],
-    'terlambat dikembalikan' => ['bg-danger text-light', 'Terlambat Dikembalikan'],
-    'menunggu konfirmasi pengembalian' => ['bg-warning text-dark', 'Menunggu Konfirmasi Pengembalian'],
-    'ditolak pengembalian' => ['bg-danger text-light', 'Ditolak Pengembalian'],
-    'Selesai Dikembalikan' => ['bg-success text-dark', 'Selesai Dikembalikan'],
-    'batal' => ['bg-secondary text-light', 'Batal'],
-    'belumbayar' => ['bg-warning text-dark', 'Belum Bayar']
-];
+
 ?>
 
 <!DOCTYPE html>
@@ -48,6 +35,7 @@ $status_map = [
   <title>Histori Transaksi - Subang Outdoor</title>
   <link rel="stylesheet" href="css/bootstrap.css">
   <link rel="stylesheet" href="css/main.css">
+   <link rel="shortcut icon" href="../../assets/img/logo.jpg">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 <body>
@@ -82,14 +70,14 @@ $status_map = [
         $status_text = $status_map[$status][1] ?? ucfirst($transaksi['status']);
       ?>
       <div class="card mb-4 shadow-sm p-3" style="min-width: 360px; max-width: 520px; flex: 1;">
-        <div class="card-header d-flex justify-content-between align-items-center">
-          <div>
-            <strong>ID Transaksi: <?= htmlspecialchars($transaksi['id_transaksi']); ?></strong><br>
-           Status: <span class="badge <?= $badge_class; ?>"><?= htmlspecialchars($status_text); ?></span><br>
+       <div class="card-header d-flex justify-content-between align-items-center">
+  <div>
+    <strong>ID Transaksi:</strong> <?= htmlspecialchars($transaksi['id_transaksi']); ?><br>
+    <strong>Status: <?= htmlspecialchars($status_text); ?></strong><br>
+    <strong>Metode:</strong> <?= htmlspecialchars($transaksi['nama_metode']); ?>
+  </div>
+</div>
 
-            <small>Metode: <?= htmlspecialchars($transaksi['nama_metode']); ?></small>
-          </div>
-        </div>
         <div class="card-body">
           <?php
           $id_transaksi = $transaksi['id_transaksi']; 

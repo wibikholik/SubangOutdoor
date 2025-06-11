@@ -130,22 +130,32 @@ while ($row = mysqli_fetch_assoc($result)) {
                                                 <?= ucwords($row['status_pengembalian']) ?>
                                             </span>
                                         </td>
-                                        <td>
-                                            <form action="update_status.php" method="POST" style="min-width:150px;">
-                                                <!-- CSRF token -->
-                                                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
-                                                <!-- ID pengembalian -->
-                                                <input type="hidden" name="id_pengembalian" value="<?= htmlspecialchars($row['id_pengembalian']) ?>">
-                                                <!-- ID transaksi -->
-                                                <input type="hidden" name="id_transaksi" value="<?= htmlspecialchars($row['id_transaksi']) ?>">
+                                       <td>
+    <form action="update_status.php" method="POST" style="min-width:150px; display:inline-block;">
+        <!-- CSRF token -->
+        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
+        <!-- ID pengembalian -->
+        <input type="hidden" name="id_pengembalian" value="<?= htmlspecialchars($row['id_pengembalian']) ?>">
+        <!-- ID transaksi -->
+        <input type="hidden" name="id_transaksi" value="<?= htmlspecialchars($row['id_transaksi']) ?>">
 
-                                                <select name="status_baru" class="form-control form-control-sm" onchange="this.form.submit()">
-                                                    <option value="Menunggu Konfirmasi Pengembalian" <?= $row['status_pengembalian'] === 'Menunggu Konfirmasi Pengembalian' ? 'selected' : '' ?>>Menunggu Konfirmasi Pengembalian</option>
-                                                    <option value="Selesai Dikembalikan" <?= $row['status_pengembalian'] === 'Selesai Dikembalikan' ? 'selected' : '' ?>>Selesai</option>
-                                                    <option value="Ditolak Pengembalian" <?= $row['status_pengembalian'] === 'Ditolak Pengembalian' ? 'selected' : '' ?>>Ditolak Pengembalian</option>
-                                                </select>
-                                            </form>
-                                        </td>
+        <select name="status_baru" class="form-control form-control-sm" onchange="this.form.submit()">
+            <option value="Menunggu Konfirmasi Pengembalian" <?= $row['status_pengembalian'] === 'Menunggu Konfirmasi Pengembalian' ? 'selected' : '' ?>>Menunggu Konfirmasi Pengembalian</option>
+            <option value="Selesai Dikembalikan" <?= $row['status_pengembalian'] === 'Selesai Dikembalikan' ? 'selected' : '' ?>>Selesai</option>
+            <option value="Ditolak Pengembalian" <?= $row['status_pengembalian'] === 'Ditolak Pengembalian' ? 'selected' : '' ?>>Ditolak Pengembalian</option>
+        </select>
+    </form>
+
+    <!-- Form hapus -->
+    <form action="delete_pengembalian.php" method="POST" style="display:inline-block;" onsubmit="return confirm('Yakin ingin menghapus data pengembalian ini?');">
+        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
+        <input type="hidden" name="id_pengembalian" value="<?= htmlspecialchars($row['id_pengembalian']) ?>"><br>
+        <button type="submit" class="btn btn-sm btn-danger" title="Hapus Data">
+          Hapus
+        </button>
+    </form>
+</td>
+
                                     </tr>
                                 <?php endforeach; ?>
                             </tbody>

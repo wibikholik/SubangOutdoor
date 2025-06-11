@@ -5,37 +5,53 @@ if (isset($_GET['id_barang'])) {
     $id_barang = intval($_GET['id_barang']); // amankan input ID
 
     // Cek apakah barang masih dipakai di detail_transaksi
-    $cek_detail = mysqli_query($koneksi, "SELECT COUNT(*) as jumlah FROM detail_transaksi WHERE id_barang = '$id_barang'");
-    $data_detail = mysqli_fetch_assoc($cek_detail);
+    $stmt = mysqli_prepare($koneksi, "SELECT COUNT(*) as jumlah FROM detail_transaksi WHERE id_barang = ?");
+    mysqli_stmt_bind_param($stmt, "i", $id_barang);
+    mysqli_stmt_execute($stmt);
+    mysqli_stmt_bind_result($stmt, $jumlah_detail);
+    mysqli_stmt_fetch($stmt);
+    mysqli_stmt_close($stmt);
 
     // Cek apakah barang masih dipakai di carts
-    $cek_cart = mysqli_query($koneksi, "SELECT COUNT(*) as jumlah FROM carts WHERE id_barang = '$id_barang'");
-    $data_cart = mysqli_fetch_assoc($cek_cart);
+    $stmt = mysqli_prepare($koneksi, "SELECT COUNT(*) as jumlah FROM carts WHERE id_barang = ?");
+    mysqli_stmt_bind_param($stmt, "i", $id_barang);
+    mysqli_stmt_execute($stmt);
+    mysqli_stmt_bind_result($stmt, $jumlah_cart);
+    mysqli_stmt_fetch($stmt);
+    mysqli_stmt_close($stmt);
 
-    if ($data_detail['jumlah'] > 0 || $data_cart['jumlah'] > 0) {
+    if ($jumlah_detail > 0 || $jumlah_cart > 0) {
         // Jika masih digunakan, kirim pesan gagal via query string
         header("location: barang.php?pesan=gagalhapus");
         exit;
     }
 
     // Ambil nama file gambar dari database sebelum hapus
-    $result = mysqli_query($koneksi, "SELECT Gambar FROM barang WHERE id_barang = '$id_barang'");
-    $row = mysqli_fetch_assoc($result);
+    $stmt = mysqli_prepare($koneksi, "SELECT gambar FROM barang WHERE id_barang = ?");
+    mysqli_stmt_bind_param($stmt, "i", $id_barang);
+    mysqli_stmt_execute($stmt);
+    mysqli_stmt_bind_result($stmt, $nama_gambar);
+    mysqli_stmt_fetch($stmt);
+    mysqli_stmt_close($stmt);
 
-    if ($row) {
-        $folder_upload = "barang/gambar/";
-        $file_gambar = $folder_upload . $row['Gambar'];
+    if ($nama_gambar) {
+        $folder_upload = __DIR__ . "/barang/gambar/"; // __DIR__ adalah direktori file ini
+        $file_gambar = $folder_upload . $nama_gambar;
 
         // Cek jika file gambar ada, hapus file gambar
         if (file_exists($file_gambar)) {
-            unlink($file_gambar);
+            if (!unlink($file_gambar)) {
+                // Optional: Log atau berikan info jika gagal hapus file
+                // error_log("Gagal menghapus file gambar: $file_gambar");
+            }
         }
     }
 
-    // Jika aman, hapus data barang
-    $query = mysqli_query($koneksi, "DELETE FROM barang WHERE id_barang = '$id_barang'");
+    // Hapus data barang
+    $stmt = mysqli_prepare($koneksi, "DELETE FROM barang WHERE id_barang = ?");
+    mysqli_stmt_bind_param($stmt, "i", $id_barang);
 
-    if ($query) {
+    if (mysqli_stmt_execute($stmt)) {
         header("location: barang.php?pesan=hapus");
         exit;
     } else {
