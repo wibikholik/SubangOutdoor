@@ -182,13 +182,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="form-group">
                 <label for="password">Password Baru</label>
                 <input type="password" name="password" id="password" placeholder="Minimal 8 karakter" required minlength="8">
+                <span id="togglePassword" class="toggle-password">👁️</span>
             </div>
             <div class="form-group">
                 <label for="confirm_password">Konfirmasi Password Baru</label>
                 <input type="password" name="confirm_password" id="confirm_password" placeholder="Ketik ulang password baru" required>
+                <span id="togglePassword" class="toggle-password">👁️</span>
             </div>
             <button type="submit">Reset Password</button>
         </form>
     </div>
+     <script>
+        const togglePassword = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('password');
+
+        togglePassword.addEventListener('click', function () {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            this.textContent = type === 'password' ? '👁️' : '🙈';
+        });
+    </script>
 </body>
 </html>
