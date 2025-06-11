@@ -39,8 +39,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $mail->setFrom('subangoutdoortes@gmail.com', 'Subang Outdoor');
                 $mail->addAddress($email);
                 $mail->Subject = 'Kode OTP Reset Password';
-                $mail->Body = "Kode OTP Anda adalah: $otp";
-
+                $mail->Body = "
+                    <p>Halo,</p>
+                    <p>Kami menerima permintaan untuk mereset password akun Anda di <strong>Subang Outdoor</strong>.</p>
+                    <p>Berikut adalah kode OTP Anda:</p>
+                    <h2 style='color:#2c3e50;'>$otp</h2>
+                    <p>Jangan bagikan kode ini kepada siapa pun. Kode ini hanya berlaku selama <strong>5 menit</strong>.</p>
+                    <br>
+                    <p>Jika Anda tidak merasa melakukan permintaan ini, silakan abaikan email ini.</p>
+                    <p>Terima kasih,<br>Subang Outdoor Team</p>
+                ";
                 $mail->send();
                 header("Location: verifikasi_otp.php");
                 exit;
@@ -136,7 +144,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php endif; ?>
         <form method="POST">
             <input type="email" name="email" placeholder="Masukkan Email Anda" required>
-            <button type="submit">Kirim OTP</button>
+            <button type=" submit">Kirim OTP</button>
         </form>
         <div class="back-link">
             <a href="login.php">&larr; Kembali ke Login</a>
