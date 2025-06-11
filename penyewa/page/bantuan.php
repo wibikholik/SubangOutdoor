@@ -17,12 +17,11 @@
   <link rel="stylesheet" href="css/nouislider.min.css">
   <link rel="stylesheet" href="css/bootstrap.css">
   <link rel="stylesheet" href="css/main.css">
-<<<<<<< HEAD
+
    <link rel="shortcut icon" href="../../assets/img/logo.jpg">
-=======
 
   <!-- Bootstrap JS -->
->>>>>>> 6fbe104b34250c9f41a40f6f96940ffe242a17f1
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
   <style>
