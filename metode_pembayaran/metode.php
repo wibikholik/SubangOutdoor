@@ -21,7 +21,7 @@ if (isset($_GET['pesan'])) {
     }
 }
 
-// Ambil data penyewa dari database
+// Ambil data metode pembayaran dari database
 $query = "SELECT * FROM metode_pembayaran ORDER BY id_metode DESC";
 $result = mysqli_query($koneksi, $query);
 ?>
@@ -32,49 +32,45 @@ $result = mysqli_query($koneksi, $query);
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Subang Outdoor - Data Penyewa</title>
+    <title>Subang Outdoor - Metode Pembayaran</title>
 
-    <!-- Font & CSS -->
     <link href="../assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
     <link href="../assets/css/sb-admin-2.min.css" rel="stylesheet">
+    
+    <link href="../assets/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
 </head>
 
 <body id="page-top">
 
     <div id="wrapper">
-        <!-- Sidebar -->
         <?php include '../layout/sidebar.php'; ?>
-        <!-- End Sidebar -->
-
         <div id="content-wrapper" class="d-flex flex-column">
             <div id="content">
-                <!-- Topbar -->
                 <?php include '../layout/navbar.php'; ?>
-                <!-- End Topbar -->
-
                 <div class="container-fluid">
-                    <!-- Heading -->
                     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                        <h1 class="h3 mb-0 text-gray-800">Data Metode</h1>
+                        <h1 class="h3 mb-0 text-gray-800">Data Metode Pembayaran</h1>
                     </div>
 
-                    <!-- Notifikasi -->
                     <?php if ($message != ''): ?>
-                        <div class="alert alert-success">
-                            <?= $message ?>
+                        <div class="alert alert-info alert-dismissible fade show" role="alert">
+                            <?= htmlspecialchars($message) ?>
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
                         </div>
                     <?php endif; ?>
 
-                    <!-- Tabel Data -->
                     <div class="card shadow mb-4">
                         <div class="card-header py-3">
-                            <a class="btn btn-primary" href="tambah_metode.php" role="button">Tambah</a>
+                            <a class="btn btn-primary" href="tambah_metode.php" role="button">
+                                <i class="fas fa-plus"></i> Tambah Metode
+                            </a>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
                                 <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                                    <thead class="thead-dark">
+                                   <thead class="thead-light">
                                         <tr>
                                             <th>ID</th>
                                             <th>Nama Metode</th>
@@ -85,25 +81,35 @@ $result = mysqli_query($koneksi, $query);
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <?php while ($row = mysqli_fetch_assoc($result)) : ?>
-                                            <tr>
-                                                <td><?= $row['id_metode'] ?></td>
-                                                <td><?= htmlspecialchars($row['nama_metode']) ?></td>
-                                                <td><?= htmlspecialchars($row['nomor_rekening']) ?></td>
-                                                <td>
+                                        <?php if ($result && mysqli_num_rows($result) > 0): ?>
+                                            <?php while ($row = mysqli_fetch_assoc($result)) : ?>
+                                                <tr>
+                                                    <td><?= $row['id_metode'] ?></td>
+                                                    <td><?= htmlspecialchars($row['nama_metode']) ?></td>
+                                                    <td><?= htmlspecialchars($row['nomor_rekening']) ?></td>
+                                                    <td>
                                                         <?php if (!empty($row['gambar_metode'])): ?>
                                                             <img src="metode/gambar/<?= $row['gambar_metode'] ?>" width="100" alt="gambar_metode">
                                                         <?php else: ?>
                                                             <em>tidak ada</em>
                                                         <?php endif; ?>
                                                     </td>
-                                                <td><?= htmlspecialchars($row['atas_nama']) ?></td>
-                                                <td>
-                                                    <a class="btn btn-warning btn-sm" href="edit.php?id_metode=<?= $row['id_metode'] ?>">Edit</a>
-                                                    <a class="btn btn-danger btn-sm" href="hapus.php?id_metode=<?= $row['id_metode'] ?>" onclick="return confirm('Yakin ingin menghapus data ini?')">Hapus</a>
-                                                </td>
+                                                    <td><?= htmlspecialchars($row['atas_nama']) ?></td>
+                                                    <td>
+                                                        <a class="btn btn-warning btn-sm" href="edit.php?id_metode=<?= $row['id_metode'] ?>" data-toggle="tooltip" title="Edit">
+                                                            <i class="fas fa-pencil-alt"></i>
+                                                        </a>
+                                                        <a class="btn btn-danger btn-sm" href="hapus.php?id_metode=<?= $row['id_metode'] ?>" onclick="return confirm('Yakin ingin menghapus data ini?')" data-toggle="tooltip" title="Hapus">
+                                                            <i class="fas fa-trash"></i>
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            <?php endwhile; ?>
+                                        <?php else: ?>
+                                            <tr>
+                                                <td colspan="6" class="text-center">Belum ada data metode pembayaran.</td>
                                             </tr>
-                                        <?php endwhile; ?>
+                                        <?php endif; ?>
                                     </tbody>
                                 </table>
                             </div>
@@ -112,14 +118,28 @@ $result = mysqli_query($koneksi, $query);
 
                 </div>
             </div>
-            <!-- Footer bisa ditambahkan jika perlu -->
-        </div>
+            </div>
     </div>
 
-    <!-- JS -->
     <script src="../assets/vendor/jquery/jquery.min.js"></script>
     <script src="../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="../assets/vendor/jquery-easing/jquery.easing.min.js"></script>
     <script src="../assets/js/sb-admin-2.min.js"></script>
+
+    <script src="../assets/vendor/datatables/jquery.dataTables.min.js"></script>
+    <script src="../assets/vendor/datatables/dataTables.bootstrap4.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            // Inisialisasi DataTable
+            $('#dataTable').DataTable({
+                "order": [[0, "desc"]]
+            });
+
+            // Inisialisasi Tooltip
+            $('[data-toggle="tooltip"]').tooltip();
+        });
+    </script>
 </body>
+
 </html>

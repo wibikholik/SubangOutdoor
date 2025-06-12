@@ -40,37 +40,29 @@ if (isset($_GET['pesan'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>Subang Outdoor - Barang</title>
 
-    <!-- Font & Template -->
     <link href="../assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css?family=Nunito:200,400,700" rel="stylesheet">
     <link href="../assets/css/sb-admin-2.min.css" rel="stylesheet">
-
-    <!-- DataTables -->
     <link href="../assets/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
 </head>
 
 <body id="page-top">
 <div id="wrapper">
 
-    <!-- Sidebar -->
     <?php include '../layout/sidebar.php'; ?>
 
     <div id="content-wrapper" class="d-flex flex-column">
         <div id="content">
 
-            <!-- Navbar -->
             <?php include '../layout/navbar.php'; ?>
 
             <div class="container-fluid">
 
-                <!-- Heading -->
                 <div class="d-sm-flex align-items-center justify-content-between mb-4">
                     <h1 class="h3 mb-0 text-gray-800">Barang</h1>
                 </div>
 
-                <!-- Notifikasi -->
                 <?php if (!empty($message)): ?>
-                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <div class="alert alert-info alert-dismissible fade show" role="alert">
                         <?= $message ?>
                         <button type="button" class="close" data-dismiss="alert" aria-label="Tutup">
                             <span aria-hidden="true">&times;</span>
@@ -78,15 +70,16 @@ if (isset($_GET['pesan'])) {
                     </div>
                 <?php endif; ?>
 
-                <!-- Data Barang -->
                 <div class="card shadow mb-4">
                     <div class="card-header py-3">
-                        <a class="btn btn-primary" href="tambah_barang.php" role="button">Tambah</a>
+                        <a class="btn btn-primary" href="tambah_barang.php" role="button">
+                            <i class="fas fa-plus"></i> Tambah Barang
+                        </a>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
                             <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                                <thead>
+                                <thead class="thead-light">
                                 <tr>
                                     <th>ID</th>
                                     <th>Nama</th>
@@ -118,8 +111,12 @@ if (isset($_GET['pesan'])) {
                                             <td><?= htmlspecialchars($row['keterangan']) ?></td>
                                             <td><?= $row['unggulan'] == 1 ? 'YA' : 'TIDAK' ?></td>
                                             <td>
-                                                <a class="btn btn-warning btn-sm" href="edit.php?id_barang=<?= $row['id_barang'] ?>">Edit</a>
-                                                <a class="btn btn-danger btn-sm" href="hapus.php?id_barang=<?= $row['id_barang'] ?>" onclick="return confirm('Yakin ingin menghapus barang ini?')">Hapus</a>
+                                                <a class="btn btn-warning btn-sm" href="edit.php?id_barang=<?= $row['id_barang'] ?>" data-toggle="tooltip" title="Edit">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <a class="btn btn-danger btn-sm" href="hapus.php?id_barang=<?= $row['id_barang'] ?>" onclick="return confirm('Yakin ingin menghapus barang ini?')" data-toggle="tooltip" title="Hapus">
+                                                    <i class="fas fa-trash"></i>
+                                                </a>
                                             </td>
                                         </tr>
                                     <?php endwhile; ?>
@@ -134,25 +131,23 @@ if (isset($_GET['pesan'])) {
                     </div>
                 </div>
 
-            </div> <!-- container-fluid -->
-        </div> <!-- content -->
-    </div> <!-- content-wrapper -->
-
-</div> <!-- wrapper -->
-
-<!-- JS Scripts -->
-<script src="../assets/vendor/jquery/jquery.min.js"></script>
+            </div> </div> </div> </div> <script src="../assets/vendor/jquery/jquery.min.js"></script>
 <script src="../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script src="../assets/vendor/jquery-easing/jquery.easing.min.js"></script>
 <script src="../assets/js/sb-admin-2.min.js"></script>
 
-<!-- DataTables -->
 <script src="../assets/vendor/datatables/jquery.dataTables.min.js"></script>
 <script src="../assets/vendor/datatables/dataTables.bootstrap4.min.js"></script>
 <script>
+    // Inisialisasi DataTable
     $('#dataTable').DataTable({
         "order": [[0, "desc"]]
     });
+
+    // Inisialisasi Tooltip (untuk title pada ikon)
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+    })
 </script>
 
 </body>

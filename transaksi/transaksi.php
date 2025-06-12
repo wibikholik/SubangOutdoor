@@ -79,7 +79,6 @@ function getBadgeClass($status) {
     <meta charset="utf-8">
     <title>Subang Outdoor - Data Transaksi</title>
     <link href="../assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
-    <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
     <link href="../assets/css/sb-admin-2.min.css" rel="stylesheet">
 </head>
 

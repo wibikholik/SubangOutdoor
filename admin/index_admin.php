@@ -36,27 +36,37 @@ $grafik_pengembalian = mysqli_query($koneksi, "
 $labels_bulan = [];
 $data_penyewaan = [];
 $data_pengembalian = [];
+$bulan_unik = [];
 
-// Ambil data penyewaan
+// Ambil data penyewaan dan kumpulkan bulan unik
+$penyewaan_tmp = [];
 while ($row = mysqli_fetch_assoc($grafik_penyewaan)) {
-    $labels_bulan[] = $row['bulan'];
-    $data_penyewaan[] = (int)$row['total_penyewaan'];
+    if (!in_array($row['bulan'], $bulan_unik)) {
+        $bulan_unik[] = $row['bulan'];
+    }
+    $penyewaan_tmp[$row['bulan']] = (int)$row['total_penyewaan'];
 }
 
 // Ambil data pengembalian ke array asosiasi per bulan
 $pengembalian_tmp = [];
 while ($row = mysqli_fetch_assoc($grafik_pengembalian)) {
+    if (!in_array($row['bulan'], $bulan_unik)) {
+        $bulan_unik[] = $row['bulan'];
+    }
     $pengembalian_tmp[$row['bulan']] = (int)$row['total_pengembalian'];
 }
+sort($bulan_unik);
 
-// Sesuaikan data pengembalian berdasarkan label bulan (jika tidak ada data, 0)
-foreach ($labels_bulan as $bulan) {
+// Sesuaikan data penyewaan dan pengembalian berdasarkan label bulan (jika tidak ada data, 0)
+foreach ($bulan_unik as $bulan) {
+    $labels_bulan[] = date("M Y", strtotime($bulan . "-01")); // Format bulan agar lebih mudah dibaca
+    $data_penyewaan[] = $penyewaan_tmp[$bulan] ?? 0;
     $data_pengembalian[] = $pengembalian_tmp[$bulan] ?? 0;
 }
 
+
 // Ringkasan
 $total_penyewa = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) AS total FROM penyewa"))['total'];
-$total_admin = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) AS total FROM admin"))['total'];
 $total_barang = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) AS total FROM barang"))['total'];
 $total_barang_disewa = mysqli_fetch_assoc(mysqli_query($koneksi, "
     SELECT SUM(dt.jumlah_barang) AS total 
@@ -74,7 +84,7 @@ $total_barang_disewa = mysqli_fetch_assoc(mysqli_query($koneksi, "
     <title>Dashboard - Subang Outdoor</title>
     <link href="../assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" />
     <link href="../assets/css/sb-admin-2.min.css" rel="stylesheet" />
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="../assets/css/custom.css" rel="stylesheet" />
 </head>
 <body id="page-top">
 <div id="wrapper">
@@ -88,15 +98,15 @@ $total_barang_disewa = mysqli_fetch_assoc(mysqli_query($koneksi, "
                 <h1 class="h3 mb-4 text-gray-800">Dashboard</h1>
 
                 <div class="row">
-                    <!-- Kartu Ringkasan -->
                     <?php
+                    // PERUBAHAN 1: Array dikembalikan menjadi 3 item, "Total Admin" dihapus.
                     $ringkasan = [
                         ['title' => 'Penyewa Terdaftar', 'total' => $total_penyewa, 'icon' => 'fa-users', 'color' => 'primary'],
                         ['title' => 'Barang Tersedia', 'total' => $total_barang, 'icon' => 'fa-boxes', 'color' => 'warning'],
-                        ['title' => 'Total Barang Disewa', 'total' => $total_barang_disewa, 'icon' => 'fa-shopping-cart', 'color' => 'danger'],
+                        ['title' => 'Barang Disewa', 'total' => $total_barang_disewa, 'icon' => 'fa-shopping-cart', 'color' => 'danger'],
                     ];
                     foreach ($ringkasan as $data): ?>
-                        <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="col-xl-4 col-md-6 mb-4">
                             <div class="card border-left-<?= $data['color'] ?> shadow h-100 py-2">
                                 <div class="card-body">
                                     <div class="row no-gutters align-items-center">
@@ -114,63 +124,59 @@ $total_barang_disewa = mysqli_fetch_assoc(mysqli_query($koneksi, "
                     <?php endforeach; ?>
                 </div>
 
-                <!-- Stok Menipis -->
-                <div class="card shadow mb-4">
-                    <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-primary">Barang dengan Stok Menipis</h6></div>
-                    <div class="card-body">
-                        <table class="table table-bordered">
-                            <thead>
-                                <tr><th>ID Barang</th><th>Nama Barang</th><th>Stok</th></tr>
-                            </thead>
-                            <tbody>
-                                <?php if (mysqli_num_rows($barang_menipis) > 0): ?>
-                                    <?php while ($row = mysqli_fetch_assoc($barang_menipis)): ?>
-                                        <tr>
-                                            <td><?= htmlspecialchars($row['id_barang']) ?></td>
-                                            <td><?= htmlspecialchars($row['nama_barang']) ?></td>
-                                            <td><?= (int)$row['stok'] ?></td>
-                                        </tr>
-                                    <?php endwhile; ?>
-                                <?php else: ?>
-                                    <tr><td colspan="3" class="text-center">Tidak ada barang dengan stok menipis.</td></tr>
-                                <?php endif; ?>
-                            </tbody>
-                        </table>
+                <div class="row">
+                    <div class="col-lg-7">
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-info">Grafik Penyewaan & Pengembalian per Bulan</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container" style="position: relative; height:300px;">
+                                    <canvas id="grafikPenyewaan"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-5">
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-primary">Barang Stok Menipis</h6></div>
+                            <div class="card-body" style="max-height: 150px; overflow-y: auto;">
+                                <ul class="list-group list-group-flush">
+                                    <?php if (mysqli_num_rows($barang_menipis) > 0): ?>
+                                        <?php while ($row = mysqli_fetch_assoc($barang_menipis)): ?>
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                <?= htmlspecialchars($row['nama_barang']) ?>
+                                                <span class="badge badge-danger badge-pill"><?= (int)$row['stok'] ?></span>
+                                            </li>
+                                        <?php endwhile; ?>
+                                    <?php else: ?>
+                                        <li class="list-group-item text-center">Aman, tidak ada stok menipis.</li>
+                                    <?php endif; ?>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="card shadow mb-4">
+                             <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-success">Penyewa Teratas</h6></div>
+                             <div class="card-body" style="max-height: 150px; overflow-y: auto;">
+                                <ul class="list-group list-group-flush">
+                                    <?php if (mysqli_num_rows($penyewa_top) > 0): ?>
+                                        <?php while ($row = mysqli_fetch_assoc($penyewa_top)): ?>
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                <?= htmlspecialchars($row['nama_penyewa']) ?>
+                                                <span class="badge badge-primary badge-pill"><?= (int)$row['total_transaksi'] ?>x sewa</span>
+                                            </li>
+                                        <?php endwhile; ?>
+                                    <?php else: ?>
+                                        <li class="list-group-item text-center">Belum ada data transaksi.</li>
+                                    <?php endif; ?>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Penyewa Top -->
-                <div class="card shadow mb-4">
-                    <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-success">Penyewa Teratas</h6></div>
-                    <div class="card-body">
-                        <table class="table table-bordered">
-                            <thead>
-                                <tr><th>ID Penyewa</th><th>Nama Penyewa</th><th>Total Transaksi</th></tr>
-                            </thead>
-                            <tbody>
-                                <?php if (mysqli_num_rows($penyewa_top) > 0): ?>
-                                    <?php while ($row = mysqli_fetch_assoc($penyewa_top)): ?>
-                                        <tr>
-                                            <td><?= htmlspecialchars($row['id_penyewa']) ?></td>
-                                            <td><?= htmlspecialchars($row['nama_penyewa']) ?></td>
-                                            <td><?= (int)$row['total_transaksi'] ?></td>
-                                        </tr>
-                                    <?php endwhile; ?>
-                                <?php else: ?>
-                                    <tr><td colspan="3" class="text-center">Belum ada data penyewa.</td></tr>
-                                <?php endif; ?>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Grafik Penyewaan dan Pengembalian -->
-                <div class="card shadow mb-4">
-    <div class="card-header py-3">
-        <h6 class="m-0 font-weight-bold text-info">Grafik Penyewaan & Pengembalian per Bulan</h6>
-    </div>
-    <div class="card-body">
-        <canvas id="grafikPenyewaan" height="100"></canvas>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -181,33 +187,29 @@ $total_barang_disewa = mysqli_fetch_assoc(mysqli_query($koneksi, "
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-    // 1. Data dari PHP (tidak ada perubahan di sini)
     const labelsBulan = <?= json_encode($labels_bulan ?? []) ?>;
     const dataPenyewaan = <?= json_encode($data_penyewaan ?? []) ?>;
     const dataPengembalian = <?= json_encode($data_pengembalian ?? []) ?>;
-
-    // 2. Ambil konteks dari elemen canvas
     const ctx = document.getElementById('grafikPenyewaan').getContext('2d');
 
-    // 3. Buat Grafik Batang (Bar Chart) baru
     new Chart(ctx, {
-        type: 'bar', // Mengubah tipe grafik menjadi 'bar'
+        type: 'bar',
         data: {
             labels: labelsBulan,
             datasets: [{
                 label: 'Jumlah Penyewaan',
                 data: dataPenyewaan,
-                backgroundColor: '#4e73df', // Warna batang untuk penyewaan
+                backgroundColor: '#4e73df',
                 borderColor: '#4e73df',
                 borderWidth: 1,
-                maxBarThickness: 40 // Mengatur ketebalan maksimum batang (opsional)
+                maxBarThickness: 40
             }, {
                 label: 'Jumlah Pengembalian',
                 data: dataPengembalian,
-                backgroundColor: '#1cc88a', // Warna batang untuk pengembalian
+                backgroundColor: '#1cc88a',
                 borderColor: '#1cc88a',
                 borderWidth: 1,
-                maxBarThickness: 40 // Mengatur ketebalan maksimum batang (opsional)
+                maxBarThickness: 40
             }]
         },
         options: {
@@ -217,21 +219,18 @@ $total_barang_disewa = mysqli_fetch_assoc(mysqli_query($koneksi, "
                 y: {
                     beginAtZero: true,
                     ticks: {
-                        // Memastikan sumbu Y hanya menampilkan bilangan bulat
                         precision: 0
                     }
                 },
                 x: {
-                    // Memberi sedikit ruang di awal dan akhir sumbu X
                     offset: true
                 }
             },
             plugins: {
                 legend: {
-                    position: 'top', // Posisi legenda di atas
+                    position: 'top',
                 },
                 tooltip: {
-                    // Kustomisasi tooltip saat mouse hover
                     callbacks: {
                         label: function(context) {
                             let label = context.dataset.label || '';

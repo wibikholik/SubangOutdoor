@@ -7,7 +7,7 @@ if (session_status() === PHP_SESSION_NONE) {
 $username = $_SESSION['username'] ?? 'Guest';
 ?>
 
-<nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+<nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 sticky-top shadow">
 
     <!-- Sidebar Toggle (Topbar) -->
     <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
@@ -44,3 +44,15 @@ $username = $_SESSION['username'] ?? 'Guest';
     </ul>
 
 </nav>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link href="../assets/css/custom.css" rel="stylesheet" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+    
+</body>
+</html>

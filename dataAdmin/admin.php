@@ -21,7 +21,7 @@ if (isset($_GET['pesan'])) {
     }
 }
 
-$query = "SELECT * FROM admin";
+$query = "SELECT * FROM admin ORDER BY id_admin ASC";
 $result = mysqli_query($koneksi, $query);
 if (!$result) {
     die("Query Error: " . mysqli_error($koneksi));
@@ -37,78 +37,53 @@ if (!$result) {
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <title>Data Admin - Owner Panel | Subang Outdoor</title>
 
-    <!-- Custom fonts for this template-->
     <link href="../assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css" />
-    <link
-        href="https://fonts.googleapis.com/css?family=Nunito:200,400,700"
-        rel="stylesheet"/>
 
-    <!-- Custom styles for this template-->
     <link href="../assets/css/sb-admin-2.min.css" rel="stylesheet" />
+    <link href="../assets/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
 </head>
 
 <body id="page-top">
 
-    <!-- Page Wrapper -->
     <div id="wrapper">
 
-        <!-- Sidebar -->
         <?php include '../layout/sidebar.php'; ?>
-        <!-- End of Sidebar -->
-
-        <!-- Content Wrapper -->
         <div id="content-wrapper" class="d-flex flex-column">
 
-            <!-- Main Content -->
             <div id="content">
 
-                <!-- Navbar -->
                 <?php include '../layout/navbar.php'; ?>
-                <!-- End Navbar -->
-
-                <!-- Begin Page Content -->
                 <div class="container-fluid">
 
-                    <!-- Page Heading -->
                     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                        <h1 class="h3 mb-0 text-gray-800"><i class="fas fa-users-cog"></i> Data Admin</h1>
-                        
+                        <h1 class="h3 mb-0 text-gray-800"></i> Data Admin</h1>
                     </div>
 
-                    <!-- Notifikasi Pesan -->
-                    <?php if (!empty($message)) :
-                        $color = 'alert-success';
-                        $icon = '<i class="fas fa-check-circle"></i>';
-                        if (isset($pesan)) {
-                            if ($pesan === "hapus") {
-                                $color = 'alert-danger';
-                                $icon = '<i class="fas fa-trash-alt"></i>';
-                            } elseif ($pesan === "update") {
-                                $color = 'alert-primary';
-                                $icon = '<i class="fas fa-pen"></i>';
-                            }
-                        }
-                    ?>
-                        <div class="alert <?= $color ?> alert-dismissible fade show" role="alert">
-                            <?= $icon ?> <?= htmlspecialchars($message) ?>
+                    <?php if (!empty($message)) : ?>
+                        <div class="alert alert-info alert-dismissible fade show" role="alert">
+                            <?= htmlspecialchars($message) ?>
                             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
                     <?php endif; ?>
 
-                    <!-- Data Table -->
+
                     <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <a href="tambah_admin.php" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Tambah Admin
+                            </a>
+                        </div>
                         <div class="card-body">
                             <div class="table-responsive">
                                 <table
-                                    class="table table-bordered table-hover"
+                                    class="table table-bordered"
                                     id="dataTable"
                                     width="100%"
                                     cellspacing="0"
                                 >
                                     <thead class="thead-light">
-                                        <a href="tambah_admin.php" class="btn btn-primary ">Tambah Admin</a>
                                         <tr>
                                             <th>ID Admin</th>
                                             <th>Username</th>
@@ -130,9 +105,11 @@ if (!$result) {
                                                     <td><?= htmlspecialchars($row['no_hp']) ?></td>
                                                     <td><?= htmlspecialchars($row['email']) ?></td>
                                                     <td>
-                                                        <a href="editAdmin.php?id_admin=<?= urlencode($row['id_admin']) ?>" class="btn btn-sm btn-warning" title="Edit Data">Edit
+                                                        <a href="editAdmin.php?id_admin=<?= urlencode($row['id_admin']) ?>" class="btn btn-sm btn-warning" data-toggle="tooltip" title="Edit Data">
+                                                            <i class="fas fa-pencil-alt"></i>
                                                         </a>
-                                                        <a href="hapus.php?id_admin=<?= urlencode($row['id_admin']) ?>" class="btn btn-sm btn-danger" title="Hapus Data" onclick="return confirm('Apakah Anda yakin ingin menghapus data ini?');">Hapus
+                                                        <a href="hapus.php?id_admin=<?= urlencode($row['id_admin']) ?>" class="btn btn-sm btn-danger" data-toggle="tooltip" title="Hapus Data" onclick="return confirm('Apakah Anda yakin ingin menghapus data ini?');">
+                                                            <i class="fas fa-times-circle"></i>
                                                         </a>
                                                     </td>
                                                 </tr>
@@ -149,42 +126,31 @@ if (!$result) {
                     </div>
 
                 </div>
-                <!-- /.container-fluid -->
-
+                </div>
             </div>
-            <!-- End of Main Content -->
-
         </div>
-        <!-- End of Content Wrapper -->
-
-    </div>
-    <!-- End of Page Wrapper -->
-
-    <!-- Scroll to Top Button-->
     <a class="scroll-to-top rounded" href="#page-top">
         <i class="fas fa-angle-up"></i>
     </a>
 
-    <!-- Bootstrap core JavaScript-->
     <script src="../assets/vendor/jquery/jquery.min.js"></script>
     <script src="../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-
-    <!-- Core plugin JavaScript-->
     <script src="../assets/vendor/jquery-easing/jquery.easing.min.js"></script>
-
-    <!-- Custom scripts for all pages-->
     <script src="../assets/js/sb-admin-2.min.js"></script>
-
-    <!-- DataTables scripts -->
     <script src="../assets/vendor/datatables/jquery.dataTables.min.js"></script>
     <script src="../assets/vendor/datatables/dataTables.bootstrap4.min.js"></script>
-
     <script>
         $(document).ready(function () {
+            // Inisialisasi DataTable
             $('#dataTable').DataTable({
-                // Optional config
                 "order": [[0, "asc"]],
+                "columnDefs": [
+                    { "orderable": false, "targets": 6 } // Kolom "Aksi" tidak bisa diurutkan
+                ]
             });
+
+            // Inisialisasi Tooltip
+            $('[data-toggle="tooltip"]').tooltip();
         });
     </script>
 

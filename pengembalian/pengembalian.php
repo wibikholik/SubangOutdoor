@@ -11,6 +11,13 @@ if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
+// Menangani pesan notifikasi dari session
+$notification_message = '';
+if (isset($_SESSION['notification'])) {
+    $notification_message = $_SESSION['notification'];
+    unset($_SESSION['notification']);
+}
+
 $query = "
 SELECT 
     p.id_pengembalian,
@@ -47,10 +54,10 @@ while ($row = mysqli_fetch_assoc($result)) {
 <head>
     <meta charset="UTF-8" />
     <title>Daftar Pengembalian - Subang Outdoor</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <link href="../assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet" />
     <link href="../assets/css/sb-admin-2.min.css" rel="stylesheet" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="../assets/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
 </head>
 <body id="page-top">
 <div id="wrapper">
@@ -63,22 +70,31 @@ while ($row = mysqli_fetch_assoc($result)) {
         <div class="container-fluid">
             <h1 class="h3 mb-4 text-gray-800">Daftar Pengembalian</h1>
 
+            <?php if ($notification_message): ?>
+            <div class="alert alert-info alert-dismissible fade show" role="alert">
+                <?= htmlspecialchars($notification_message) ?>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <?php endif; ?>
+
             <div class="card shadow mb-4">
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table table-bordered" width="100%" cellspacing="0">
+                        <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                             <thead class="thead-light">
                                 <tr>
                                     <th>ID</th>
                                     <th>Transaksi</th>
-                                    <th>Nama Penyewa</th>
-                                    <th>Tanggal Pengembalian</th>
+                                    <th>Penyewa</th>
+                                    <th>Tanggal</th>
                                     <th>Denda</th>
                                     <th>Kondisi</th>
-                                    <th>Bukti Pengembalian</th>
-                                    <th>Bukti Bayar Denda</th>
+                                    <th>Bukti Kembali</th>
+                                    <th>Bukti Denda</th>
                                     <th>Status</th>
-                                    <th>Aksi</th>
+                                    <th style="width: 120px;">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -87,7 +103,7 @@ while ($row = mysqli_fetch_assoc($result)) {
                                         $status = strtolower($row['status_pengembalian']);
                                         $badge_class = match($status) {
                                             'menunggu konfirmasi pengembalian' => 'warning',
-                                            'Selesai Dikembalikan' => 'success',
+                                            'selesai dikembalikan' => 'success',
                                             'ditolak' => 'danger',
                                             default => 'secondary',
                                         };
@@ -96,7 +112,7 @@ while ($row = mysqli_fetch_assoc($result)) {
                                         <td><?= htmlspecialchars($row['id_pengembalian']) ?></td>
                                         <td><?= htmlspecialchars($row['id_transaksi']) ?></td>
                                         <td><?= htmlspecialchars($row['nama_penyewa']) ?></td>
-                                        <td><?= htmlspecialchars($row['tanggal_pengembalian']) ?></td>
+                                        <td><?= date('d M Y', strtotime($row['tanggal_pengembalian'])) ?></td>
                                         <td>Rp <?= number_format($row['total_denda'], 0, ',', '.') ?></td>
                                         <td><?= htmlspecialchars($row['kondisi_barang']) ?></td>
                                         <td>
@@ -105,8 +121,10 @@ while ($row = mysqli_fetch_assoc($result)) {
                                                     class="btn btn-sm btn-info btn-bukti" 
                                                     data-toggle="modal" 
                                                     data-target="#modalBukti" 
-                                                    data-img="../uploads/pengembalian/<?= htmlspecialchars($row['bukti_pengembalian']) ?>">
-                                                    Lihat
+                                                    data-img="../uploads/pengembalian/<?= htmlspecialchars($row['bukti_pengembalian']) ?>"
+                                                    data-title="Bukti Pengembalian"
+                                                    data-toggle="tooltip" title="Lihat Bukti Pengembalian">
+                                                    <i class="fas fa-eye"></i>
                                                 </button>
                                             <?php else: ?>
                                                 <span class="text-muted">-</span>
@@ -118,8 +136,10 @@ while ($row = mysqli_fetch_assoc($result)) {
                                                     class="btn btn-sm btn-info btn-bukti" 
                                                     data-toggle="modal" 
                                                     data-target="#modalBukti" 
-                                                    data-img="../uploads/denda/<?= htmlspecialchars($row['bukti_denda']) ?>">
-                                                    Lihat
+                                                    data-img="../uploads/denda/<?= htmlspecialchars($row['bukti_denda']) ?>"
+                                                    data-title="Bukti Pembayaran Denda"
+                                                    data-toggle="tooltip" title="Lihat Bukti Denda">
+                                                    <i class="fas fa-eye"></i>
                                                 </button>
                                             <?php else: ?>
                                                 <span class="text-muted">-</span>
@@ -127,35 +147,27 @@ while ($row = mysqli_fetch_assoc($result)) {
                                         </td>
                                         <td>
                                             <span class="badge badge-<?= $badge_class ?>">
-                                                <?= ucwords($row['status_pengembalian']) ?>
+                                                <?= ucwords(str_replace('_', ' ', $status)) ?>
                                             </span>
                                         </td>
-                                       <td>
-    <form action="update_status.php" method="POST" style="min-width:150px; display:inline-block;">
-        <!-- CSRF token -->
-        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
-        <!-- ID pengembalian -->
-        <input type="hidden" name="id_pengembalian" value="<?= htmlspecialchars($row['id_pengembalian']) ?>">
-        <!-- ID transaksi -->
-        <input type="hidden" name="id_transaksi" value="<?= htmlspecialchars($row['id_transaksi']) ?>">
-
-        <select name="status_baru" class="form-control form-control-sm" onchange="this.form.submit()">
-            <option value="Menunggu Konfirmasi Pengembalian" <?= $row['status_pengembalian'] === 'Menunggu Konfirmasi Pengembalian' ? 'selected' : '' ?>>Menunggu Konfirmasi Pengembalian</option>
-            <option value="Selesai Dikembalikan" <?= $row['status_pengembalian'] === 'Selesai Dikembalikan' ? 'selected' : '' ?>>Selesai</option>
-            <option value="Ditolak Pengembalian" <?= $row['status_pengembalian'] === 'Ditolak Pengembalian' ? 'selected' : '' ?>>Ditolak Pengembalian</option>
-        </select>
-    </form>
-
-    <!-- Form hapus -->
-    <form action="delete_pengembalian.php" method="POST" style="display:inline-block;" onsubmit="return confirm('Yakin ingin menghapus data pengembalian ini?');">
-        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
-        <input type="hidden" name="id_pengembalian" value="<?= htmlspecialchars($row['id_pengembalian']) ?>"><br>
-        <button type="submit" class="btn btn-sm btn-danger" title="Hapus Data">
-          Hapus
-        </button>
-    </form>
-</td>
-
+                                        <td>
+                                            <?php if ($status == 'menunggu konfirmasi pengembalian'): ?>
+                                                <a href="update_pengembalian.php?id=<?= $row['id_pengembalian'] ?>&status=Selesai Dikembalikan" class="btn btn-sm btn-success" data-toggle="tooltip" title="Setujui Pengembalian">
+                                                    <i class="fas fa-check"></i>
+                                                </a>
+                                                <a href="update_pengembalian.php?id=<?= $row['id_pengembalian'] ?>&status=Ditolak" class="btn btn-sm btn-warning" data-toggle="tooltip" title="Tolak Pengembalian">
+                                                    <i class="fas fa-times"></i>
+                                                </a>
+                                            <?php endif; ?>
+                                            
+                                            <form action="hapus_pengembalian.php" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus data pengembalian ini?');">
+                                                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
+                                                <input type="hidden" name="id_pengembalian" value="<?= htmlspecialchars($row['id_pengembalian']) ?>">
+                                                <button type="submit" class="btn btn-sm btn-danger" data-toggle="tooltip" title="Hapus Permanen">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </td>
                                     </tr>
                                 <?php endforeach; ?>
                             </tbody>
@@ -164,7 +176,6 @@ while ($row = mysqli_fetch_assoc($result)) {
                 </div>
             </div>
 
-            <!-- Modal Bukti Global -->
             <div class="modal fade" id="modalBukti" tabindex="-1" role="dialog" aria-labelledby="modalBuktiLabel" aria-hidden="true">
                 <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
                     <div class="modal-content">
@@ -192,13 +203,32 @@ while ($row = mysqli_fetch_assoc($result)) {
 
 <script src="../assets/vendor/jquery/jquery.min.js"></script>
 <script src="../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="../assets/vendor/jquery-easing/jquery.easing.min.js"></script>
 <script src="../assets/js/sb-admin-2.min.js"></script>
+<script src="../assets/vendor/datatables/jquery.dataTables.min.js"></script>
+<script src="../assets/vendor/datatables/dataTables.bootstrap4.min.js"></script>
 
 <script>
 $(document).ready(function(){
-    $('.btn-bukti').click(function(){
+    // Inisialisasi DataTable
+    $('#dataTable').DataTable({
+        "order": [[0, "desc"]], // Urutkan berdasarkan ID Pengembalian (index 0)
+        "columnDefs": [
+            // Menonaktifkan pengurutan untuk kolom-kolom tertentu
+            { "orderable": false, "targets": [4, 5, 6, 7, 9] } 
+        ]
+    });
+
+    // Inisialisasi Tooltip
+    $('[data-toggle="tooltip"]').tooltip();
+
+    // Fungsi untuk menampilkan gambar di modal
+    $('.btn-bukti').on('click', function(){
         var imgSrc = $(this).data('img');
-        $('#imgBukti').attr('src', imgSrc);
+        var imgTitle = $(this).data('title'); // Ambil judul dari tombol
+        var modal = $('#modalBukti');
+        modal.find('#imgBukti').attr('src', imgSrc);
+        modal.find('.modal-title').text(imgTitle); // Set judul modal
     });
 });
 </script>

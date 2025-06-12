@@ -22,7 +22,6 @@ if (isset($_GET['message'])) {
             padding: 0;
             height: 100%;
         }
-
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-image: url('assets/img/bekgrun.jpg');
@@ -34,7 +33,6 @@ if (isset($_GET['message'])) {
             align-items: center;
             min-height: 100vh;
         }
-
         .login-container {
             background: rgba(255, 255, 255, 0.95);
             padding: 30px 35px;
@@ -43,17 +41,14 @@ if (isset($_GET['message'])) {
             width: 400px;
             text-align: center;
         }
-
         h2 {
             color: #333;
             margin-bottom: 25px;
         }
-
         .message {
             margin-bottom: 15px;
             font-weight: bold;
         }
-
         label {
             display: block;
             text-align: left;
@@ -62,48 +57,60 @@ if (isset($_GET['message'])) {
             margin-bottom: 6px;
         }
 
+        /* --- PERUBAHAN CSS DIMULAI DI SINI --- */
+
+        /* Aturan input umum, margin-bottom dihapus */
         input {
             width: 100%;
             padding: 10px 14px;
-            margin-bottom: 20px;
             border: 1.5px solid #ccc;
             border-radius: 8px;
             font-size: 16px;
             box-sizing: border-box;
         }
 
-        .password-container {
+        /* Wrapper baru untuk memposisikan ikon */
+        .password-input-wrapper {
             position: relative;
+            margin-bottom: 20px; /* Margin dipindahkan ke sini */
         }
 
-        .password-container input {
-            padding-right: 40px;
+        /* Input di dalam wrapper diberi padding kanan untuk ruang ikon */
+        .password-input-wrapper input {
+            padding-right: 45px;
         }
 
+        /* Aturan CSS baru yang presisi untuk ikon mata */
         .toggle-password {
             position: absolute;
-            right: 12px;
-            top: 38px;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
             cursor: pointer;
             font-size: 18px;
+            color: #777;
         }
+
+        /* --- AKHIR PERUBAHAN CSS --- */
 
         .forgot-password {
             text-align: right;
-            font-size: 13px;
-            margin-top: -15px;
+            font-size: 14px;
+            margin-top: -10px;
             margin-bottom: 20px;
         }
-
         .forgot-password a {
             color: #007BFF;
             text-decoration: none;
+            display: inline-block;
+            padding: 5px;
+            border-radius: 5px;
+            transition: background-color 0.2s ease;
         }
-
         .forgot-password a:hover {
             text-decoration: underline;
+            background-color: #e9ecef;
         }
-
         button {
             background-color: #28a745;
             color: white;
@@ -116,21 +123,17 @@ if (isset($_GET['message'])) {
             font-weight: bold;
             transition: background-color 0.3s ease;
         }
-
         button:hover {
             background-color: #218838;
         }
-
         .register-link {
             margin-top: 15px;
             font-size: 14px;
         }
-
         .register-link a {
             color: #007BFF;
             text-decoration: none;
         }
-
         .register-link a:hover {
             text-decoration: underline;
         }
@@ -147,13 +150,17 @@ if (isset($_GET['message'])) {
         <form method="POST" action="prosesLogin.php">
             <div>
                 <label for="username">Username</label>
-                <input type="text" name="username" id="username" placeholder="Masukkan username" required>
+                <input type="text" name="username" id="username" placeholder="Masukkan username" required style="margin-bottom: 20px;">
             </div>
-            <div class="password-container">
+            
+            <div>
                 <label for="password">Password</label>
-                <input type="password" name="password" id="password" placeholder="Masukkan password" required>
-                <span id="togglePassword" class="toggle-password">👁️</span>
+                <div class="password-input-wrapper">
+                    <input type="password" name="password" id="password" placeholder="Masukkan password" required>
+                    <span id="togglePassword" class="toggle-password">👁️</span>
+                </div>
             </div>
+
             <div class="forgot-password">
                 <a href="lupa_password.php">Lupa password?</a>
             </div>
